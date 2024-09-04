@@ -2,66 +2,100 @@ package model_test
 
 import (
 	"testing"
+	"time"
 	"todo/src/model"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Titleが一文字の時に作成できる(t *testing.T) {
 	title, err := model.NewTitle("a")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if title.AsGoString() != "a" {
-		t.Fatal("title is invalid")
-	}
-	t.Log("title is valid")
+
+	assert.Nil(t, err)
+	assert.Equal(t, title.AsGoString(), "a")
 }
 
-func Test_Titleが100文字の時に作成できない(t *testing.T) {
+func Test_Titleが101文字の時に作成できない(t *testing.T) {
 	word := "a"
-	for i := 0; i < 99; i++ {
+	for i := 0; i < 100; i++ {
 		word += "a"
 	}
+	
 	_, err := model.NewTitle(word)
-	if err != nil {
-		t.Fatal("title is valid")
-	}
-	t.Log("title is invalid")
+
+	assert.Equal(t, err.Error(), "title is too long")
 }
 
 func Test_Titleが空文字の時に作成できない(t *testing.T) {
 	_, err := model.NewTitle("")
-	if err != nil {
-		t.Fatal("title is valid")
-	}
-	t.Log("title is invalid")
+
+	assert.Equal(t, err.Error(), "title is empty")
 }
 
 func Test_CompleteをToggleすると値が反転する(t *testing.T) {
 	completed_false := model.NewCompleted(false)
 	completed_true := completed_false.Toggle()
-	if completed_true.AsGoBool() != true {
-		t.Fatal("completed is invalid")
-	}
-	t.Log("completed is valid")
+
+	assert.Equal(t, completed_true.AsGoBool(), true)
 }
 
-// func Test_Todoを作成する(t *testing.T) {
-// 	title, _ := model.NewTitle("title")
-// 	completed := model.NewCompleted(false)
-// 	lastUpdate := model.NewLastUpdate(model.Time{}.Now().AsGoTime())
-// 	createdAt := model.NewCreatedAt(model.Time{}.Now().AsGoTime())
-// 	todo := model.NewTodo(title, completed, lastUpdate, createdAt)
-// 	if todo.Title.AsGoString() != "title" {
-// 		t.Fatal("title is invalid")
-// 	}
-// 	if todo.Completed.AsGoBool() != false {
-// 		t.Fatal("completed is invalid")
-// 	}
-// 	if todo.LastUpdate.AsGoString() != model.Time{}.Now().AsGoString() {
-// 		t.Fatal("lastUpdate is invalid")
-// 	}
-// 	if todo.CreatedAt.AsGoString() != model.Time{}.Now().AsGoString() {
-// 		t.Fatal("createdAt is invalid")
-// 	}
-// 	t.Log("todo is valid")
-// }
+func setupTodo() (*model.Todo, model.ModelTimer, ) {
+	// ctrl := gomock.NewController(t)
+	// mock_timer := model_mock.NewMockModelTimer(ctrl)
+
+    now := model.NewModelTime(time.Date(2024, 9, 4, 12, 0, 0, 0, time.Local))
+    text := "title"
+    id := model.NewID(1)
+    title, _ := model.NewTitle(text)
+    completed := model.NewCompleted(false)
+    lastUpdate := model.NewLastUpdate(now)
+    createdAt := model.NewCreatedAt(now)
+    todo := model.NewTodo(id, title, completed, lastUpdate, createdAt)
+    return todo, now
+}
+
+func Test_Todo(t *testing.T) {
+    todo, now := setupTodo()
+
+	assert.Equal(t, todo.ID, model.NewID(1))
+	assert.Equal(t, todo.Title.AsGoString(), "title")
+	assert.Equal(t, todo.Completed.AsGoBool(), false)
+	assert.Equal(t, todo.LastUpdate.AsGoTime(), now.AsGoTime())
+	assert.Equal(t, todo.CreatedAt.AsGoTime(), now.AsGoTime())
+
+}
+
+func Test_TodoのTitleを更新できる(t *testing.T) {
+    todo, _ := setupTodo()
+    newText := "new_title"
+    newTitle, _ := model.NewTitle(newText)
+
+    todo.UpdateTitle(newTitle)
+
+    if todo.Title.AsGoString() != newText {
+        t.Fatal("title is invalid")
+    }
+    t.Log("title is valid")
+}
+
+func Test_TodoのCompleteをToggleできる(t *testing.T) {
+    todo, _ := setupTodo()
+
+    todo.ToggleCompleted()
+
+    if todo.Completed.AsGoBool() != true {
+        t.Fatal("completed is invalid")
+    }
+    t.Log("completed is valid")
+}
+
+func Test_TodoのLastUpdateを更新できる(t *testing.T) {
+	todo, _ := setupTodo()
+	now := model.NewModelTime(time.Date(2024, 9, 4, 12, 0, 0, 0, time.Local))
+
+	todo.UpdateLastUpdate(now)
+
+	if todo.LastUpdate.AsGoString() != "2024-09-04 12:00:00" {
+		t.Fatal("lastUpdate is invalid", todo.LastUpdate.AsGoString())
+	}
+}

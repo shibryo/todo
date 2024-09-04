@@ -6,9 +6,15 @@ import (
 )
 
 type ID uint64
+
+func NewID(id uint64) ID {
+	return ID(id)
+}
+
 type Title struct {
 	text string
 }
+
 func NewTitle(text string) (*Title, error) {
 	if len(text) == 0 {
 		return nil, fmt.Errorf("title is empty")
@@ -19,6 +25,7 @@ func NewTitle(text string) (*Title, error) {
 
 	return &Title{text: text}, nil
 }
+
 func (t Title) AsGoString() string {
 	return t.text
 }
@@ -26,42 +33,57 @@ func (t Title) AsGoString() string {
 type Completed struct {
 	value bool
 }
+
 func NewCompleted(value bool) *Completed {
 	return &Completed{value: value}
 }
+
 func (c Completed) AsGoBool() bool {
 	return c.value
 }
+
 func (c Completed) Toggle() Completed {
 	return *NewCompleted(!c.value)
 }
-type LastUpdate struct {
-	date time.Time
+
+func (c Completed) ToCompleted() *Completed {
+	return NewCompleted(true)
 }
-func NewLastUpdate(date time.Time) *LastUpdate {
+
+func (c Completed) ToIncompleted() *Completed {
+	return NewCompleted(false)
+}
+
+type LastUpdate struct {
+	date ModelTimer
+}
+
+func NewLastUpdate(date ModelTimer) *LastUpdate {
 	return &LastUpdate{date: date}
 }
+
 func (l LastUpdate) AsGoString() string {
-	return l.date.Format("2006-01-02 15:04:05")
+	return l.date.AsGoString()
 }
+
 func (l LastUpdate) AsGoTime() time.Time {
-	return l.date
+	return l.date.AsGoTime()
 }
+
 type CreatedAt struct {
-	date time.Time
+	date ModelTimer
 }
-func NewCreatedAt(date time.Time) *CreatedAt {
+
+func NewCreatedAt(date ModelTimer) *CreatedAt {
 	return &CreatedAt{date: date}
 }
 
-func (t *Todo) UpdateLastUpdate(lastUpdate *LastUpdate) {
-	t.LastUpdate = *NewLastUpdate(time.Now())
-}
 func (c CreatedAt) AsGoString() string {
-	return c.date.Format("2006-01-02 15:04:05")
+	return c.date.AsGoString()
 }
+
 func (c CreatedAt) AsGoTime() time.Time {
-	return c.date
+	return c.date.AsGoTime()
 }
 
 type Todo struct {
@@ -81,9 +103,23 @@ func NewTodo(id ID, title *Title, completed *Completed, lastUpdate *LastUpdate, 
 		CreatedAt:  *createdAt,
 	}
 }
+
 func (t *Todo) UpdateTitle(title *Title) {
 	t.Title = *title
 }
+
 func (t *Todo) ToggleCompleted() {
 	t.Completed = t.Completed.Toggle()
+}
+
+func (t *Todo) ToCompleted() {
+	t.Completed = *t.Completed.ToCompleted()
+}
+
+func (t *Todo) ToIncompleted() {
+	t.Completed = *t.Completed.ToIncompleted()
+}
+
+func (t *Todo) UpdateLastUpdate(now ModelTimer) {
+	t.LastUpdate = *NewLastUpdate(now)
 }
