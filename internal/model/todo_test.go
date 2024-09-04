@@ -3,7 +3,7 @@ package model_test
 import (
 	"testing"
 	"time"
-	"todo/src/model"
+	"todo/internal/model"
 
 	"github.com/stretchr/testify/assert"
 )

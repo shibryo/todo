@@ -1,7 +1,12 @@
 # generate swagger
-make swagger:
+swagger:
 	swag init
 
 # run server
-make run:
+run:
+	swag init
 	go run main.go
+
+# run test
+test:
+	go test -v ./...

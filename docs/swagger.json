@@ -35,6 +35,165 @@
                     }
                 }
             }
+        },
+        "/todos": {
+            "get": {
+                "description": "get all todos",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Find all todos",
+                "operationId": "find-all-todos",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/controller.TodoView"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "create todo",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create todo",
+                "operationId": "create-todo",
+                "parameters": [
+                    {
+                        "description": "Todo",
+                        "name": "todo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.TodoView"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.TodoView"
+                        }
+                    }
+                }
+            }
+        },
+        "/todos/{id}": {
+            "get": {
+                "description": "get todo by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Find todo by ID",
+                "operationId": "find-todo-by-id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Todo ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.TodoView"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "update todo",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update todo",
+                "operationId": "update-todo",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Todo ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Todo",
+                        "name": "todo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.TodoView"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.TodoView"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete todo",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete todo",
+                "operationId": "delete-todo",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Todo ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controller.TodoView": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_update": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
         }
     }
 }
