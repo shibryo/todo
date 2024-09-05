@@ -83,3 +83,50 @@ func TestTodoRepository_FindAll(t *testing.T) {
 	gotCount := len(got)
 	assert.Equal(t, 1, gotCount)
 }
+
+func Test_Todoが2件取得できる(t *testing.T) {
+	repository, err := NewTestTodoRepository(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// set 2data
+	text1 , err := model.NewTitle("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	todo1 := model.NewTodo(
+		0,
+		text1,
+		model.NewCompleted(false),
+		model.NewLastUpdate(model.NewModelTime(time.Now())),
+		model.NewCreatedAt(model.NewModelTime(time.Now())),
+	)
+	err = repository.Create(todo1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	text2 , err := model.NewTitle("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	todo2 := model.NewTodo(
+		0,
+		text2,
+		model.NewCompleted(false),
+		model.NewLastUpdate(model.NewModelTime(time.Now())),
+		model.NewCreatedAt(model.NewModelTime(time.Now())),
+	)
+	err = repository.Create(todo2)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := repository.FindAll()
+	if err != nil {
+		t.Fatal(err)
+	}
+	gotCount := len(got)
+	assert.Equal(t, 2, gotCount)
+}
