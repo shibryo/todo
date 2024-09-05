@@ -10,3 +10,12 @@ run:
 # run test
 test:
 	go test -v ./...
+
+# golangci-lint
+lint:
+	golangci-lint run
+
+# coverage html
+coverage:
+	go test -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out
