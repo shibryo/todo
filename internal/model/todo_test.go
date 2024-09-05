@@ -9,6 +9,7 @@ import (
 )
 
 func Test_Titleが一文字の時に作成できる(t *testing.T) {
+	t.Parallel()
 	title, err := model.NewTitle("a")
 
 	assert.Nil(t, err)
@@ -16,6 +17,7 @@ func Test_Titleが一文字の時に作成できる(t *testing.T) {
 }
 
 func Test_Titleが101文字の時に作成できない(t *testing.T) {
+	t.Parallel()
 	word := "a"
 	for i := 0; i < 100; i++ {
 		word += "a"
@@ -27,12 +29,14 @@ func Test_Titleが101文字の時に作成できない(t *testing.T) {
 }
 
 func Test_Titleが空文字の時に作成できない(t *testing.T) {
+	t.Parallel()
 	_, err := model.NewTitle("")
 
 	assert.Equal(t, err.Error(), "title is empty")
 }
 
 func Test_CompleteをToggleすると値が反転する(t *testing.T) {
+	t.Parallel()
 	completed_false := model.NewCompleted(false)
 	completed_true := completed_false.Toggle()
 
@@ -55,6 +59,7 @@ func setupTodo() (*model.Todo, model.ModelTimer, ) {
 }
 
 func Test_Todo(t *testing.T) {
+	t.Parallel()
     todo, now := setupTodo()
 
 	assert.Equal(t, todo.ID, model.NewID(1))
@@ -66,6 +71,7 @@ func Test_Todo(t *testing.T) {
 }
 
 func Test_TodoのTitleを更新できる(t *testing.T) {
+	t.Parallel()
     todo, _ := setupTodo()
     newText := "new_title"
     newTitle, _ := model.NewTitle(newText)
@@ -79,6 +85,7 @@ func Test_TodoのTitleを更新できる(t *testing.T) {
 }
 
 func Test_TodoのCompleteをToggleできる(t *testing.T) {
+	t.Parallel()
     todo, _ := setupTodo()
 
     todo.ToggleCompleted()
@@ -90,6 +97,7 @@ func Test_TodoのCompleteをToggleできる(t *testing.T) {
 }
 
 func Test_TodoのLastUpdateを更新できる(t *testing.T) {
+	t.Parallel()
 	todo, _ := setupTodo()
 	now := model.NewModelTime(time.Date(2024, 9, 4, 12, 0, 0, 0, time.Local))
 

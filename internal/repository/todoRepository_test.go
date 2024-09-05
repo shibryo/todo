@@ -54,6 +54,7 @@ func NewTestTodoRepository(t *testing.T) (repository.TodoRepositorier, error) {
 	return repository, nil
 }
 func TestTodoRepository_FindAll(t *testing.T) {
+	t.Parallel()
 	repository, err := NewTestTodoRepository(t)
 	if err != nil {
 		t.Fatal(err)
@@ -85,6 +86,7 @@ func TestTodoRepository_FindAll(t *testing.T) {
 }
 
 func Test_Todoが2件取得できる(t *testing.T) {
+	t.Parallel()
 	repository, err := NewTestTodoRepository(t)
 	if err != nil {
 		t.Fatal(err)
