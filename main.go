@@ -4,7 +4,7 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 
 	_ "todo/docs"
-	di "todo/internal"
+	"todo/internal/di"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
