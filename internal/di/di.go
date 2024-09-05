@@ -15,7 +15,7 @@ import (
 )
 
 type config struct {
-	DNS string `env:"DNS"`
+	DSN string `env:"DSN"`
 }
 
 func getEnv()  (config, error) {
@@ -24,7 +24,7 @@ func getEnv()  (config, error) {
 		return config{}, err
 	}
 	c := config{
-		DNS: os.Getenv("DSN"),
+		DSN: os.Getenv("DSN"),
 	}
 	slog.Info("getEnv", "c", c)
 	return c, nil
@@ -52,7 +52,7 @@ func NewDITodoController() (*controller.TodoController, error) {
 	if err != nil {
 		return nil, err
 	}
-	dsn := cnf.DNS
+	dsn := cnf.DSN
 	todoRepository, err := NewDITodoRepository(dsn)
 	if err != nil {
 		return nil, err
