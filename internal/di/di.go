@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"log/slog"
 	"os"
-	"todo/internal/controller"
-	"todo/internal/repository"
+	infra "todo/internal/infra"
+	view "todo/internal/view"
 
 	"github.com/joho/godotenv"
 	"github.com/uptrace/bun"
@@ -31,23 +31,23 @@ func getEnv()  (config, error) {
 }
 
 // TodoRepositoryに依存性を注入します。
-func NewDITodoRepository(dsn string) (repository.TodoRepositorier, error) {
+func NewDITodoRepository(dsn string) (infra.TodoRepositorier, error) {
 	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
 	db := bun.NewDB(sqldb, pgdialect.New())
 	// create todos table
 	_, err := db.NewCreateTable().
-		Model((*repository.Todo)(nil)).
+		Model((*infra.Todo)(nil)).
 		IfNotExists().
 		Exec(context.TODO())
 	if err != nil {	
 		return nil, err
 	}
-	todoRepository := repository.NewTodoRepository(db)
+	todoRepository := infra.NewTodoRepository(db)
 	return todoRepository, nil
 }
 
 // NewDITodoControllerはTodoControllerを生成します。
-func NewDITodoController() (*controller.TodoController, error) {
+func NewDITodoController() (*view.TodoController, error) {
 	cnf, err := getEnv()
 	if err != nil {
 		return nil, err
@@ -57,6 +57,6 @@ func NewDITodoController() (*controller.TodoController, error) {
 	if err != nil {
 		return nil, err
 	}
-	c := controller.NewTodoController(todoRepository)
+	c := view.NewTodoController(todoRepository)
 	return c, nil
 }

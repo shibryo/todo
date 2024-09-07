@@ -1,4 +1,4 @@
-package model
+package domain
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=model_mock
 

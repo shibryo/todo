@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	"todo/internal/model"
-	"todo/internal/repository"
+	model "todo/internal/domain"
+	repository "todo/internal/infra"
 
 	"github.com/labstack/echo/v4"
 )

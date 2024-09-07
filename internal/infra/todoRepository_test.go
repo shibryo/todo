@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 	"todo/internal/di"
-	"todo/internal/model"
-	"todo/internal/repository"
+	"todo/internal/domain"
+	infra "todo/internal/infra"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
@@ -45,7 +45,7 @@ func SetupDB(t *testing.T) string{
 	return connStr
 }
 
-func NewTestTodoRepository(t *testing.T) (repository.TodoRepositorier, error) {
+func NewTestTodoRepository(t *testing.T) (infra.TodoRepositorier, error) {
 	dsn := SetupDB(t)
 	repository, err := di.NewDITodoRepository(dsn)
 	if err != nil {
@@ -61,16 +61,16 @@ func TestTodoRepository_FindAll(t *testing.T) {
 	}
 
 	// set data
-	text , err := model.NewTitle("test")
+	text , err := domain.NewTitle("test")
 	if err != nil {
 		t.Fatal(err)
 	}
-	todo := model.NewTodo(
+	todo := domain.NewTodo(
 		0,
 		text,
-		model.NewCompleted(false),
-		model.NewLastUpdate(model.NewModelTime(time.Now())),
-		model.NewCreatedAt(model.NewModelTime(time.Now())),
+		domain.NewCompleted(false),
+		domain.NewLastUpdate(domain.NewModelTime(time.Now())),
+		domain.NewCreatedAt(domain.NewModelTime(time.Now())),
 	)
 	err = repository.Create(todo)
 	if err != nil {
@@ -93,32 +93,32 @@ func Test_Todoが2件取得できる(t *testing.T) {
 	}
 
 	// set 2data
-	text1 , err := model.NewTitle("test")
+	text1 , err := domain.NewTitle("test")
 	if err != nil {
 		t.Fatal(err)
 	}
-	todo1 := model.NewTodo(
+	todo1 := domain.NewTodo(
 		0,
 		text1,
-		model.NewCompleted(false),
-		model.NewLastUpdate(model.NewModelTime(time.Now())),
-		model.NewCreatedAt(model.NewModelTime(time.Now())),
+		domain.NewCompleted(false),
+		domain.NewLastUpdate(domain.NewModelTime(time.Now())),
+		domain.NewCreatedAt(domain.NewModelTime(time.Now())),
 	)
 	err = repository.Create(todo1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	text2 , err := model.NewTitle("test")
+	text2 , err := domain.NewTitle("test")
 	if err != nil {
 		t.Fatal(err)
 	}
-	todo2 := model.NewTodo(
+	todo2 := domain.NewTodo(
 		0,
 		text2,
-		model.NewCompleted(false),
-		model.NewLastUpdate(model.NewModelTime(time.Now())),
-		model.NewCreatedAt(model.NewModelTime(time.Now())),
+		domain.NewCompleted(false),
+		domain.NewLastUpdate(domain.NewModelTime(time.Now())),
+		domain.NewCreatedAt(domain.NewModelTime(time.Now())),
 	)
 	err = repository.Create(todo2)
 	if err != nil {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"time"
-	"todo/internal/model"
+	"todo/internal/domain"
 
 	"github.com/uptrace/bun"
 )
@@ -21,11 +21,11 @@ type Todo struct {
 
 // TodoRepositorierはTodoのリポジトリインターフェースです。
 type TodoRepositorier interface {
-	FindAll() ([]*model.Todo, error)
-	FindByID(id uint64) (*model.Todo, error)
-	Create(todoModel *model.Todo) error
-	Update(todoModel *model.Todo) error
-	Delete(todoModel *model.Todo) error
+	FindAll() ([]*domain.Todo, error)
+	FindByID(id uint64) (*domain.Todo, error)
+	Create(todoModel *domain.Todo) error
+	Update(todoModel *domain.Todo) error
+	Delete(todoModel *domain.Todo) error
 }
 
 // TodoRepositoryはTodoのリポジトリ構造体です。
@@ -34,7 +34,7 @@ type TodoRepository struct {
 }
 
 // FindAllは全てのTodoを取得します。
-func (t *TodoRepository) FindAll() ([]*model.Todo, error) {
+func (t *TodoRepository) FindAll() ([]*domain.Todo, error) {
 	var todos []*Todo
 	err := t.db.NewSelect().Model(&todos).Scan(context.TODO())
 	if err != nil {
@@ -47,25 +47,25 @@ func (t *TodoRepository) FindAll() ([]*model.Todo, error) {
 	return todoModels, nil
 }
 
-func convertToTodoModels(todos []*Todo) ([]*model.Todo, error) {
-	todoModels := make([]*model.Todo, 0, len(todos))
+func convertToTodoModels(todos []*Todo) ([]*domain.Todo, error) {
+	todoModels := make([]*domain.Todo, 0, len(todos))
 	for _, todo := range todos {
-		id := model.NewID(todo.ID)
-		title, err := model.NewTitle(todo.Title)
+		id := domain.NewID(todo.ID)
+		title, err := domain.NewTitle(todo.Title)
 		if err != nil {
 			return nil, fmt.Errorf("title is invalid: %w", err)
 		}
-		completed := model.NewCompleted(todo.Completed)
-		lastUpdate := model.NewLastUpdate(model.NewLastUpdate(model.NewModelTime(todo.LastUpdate)))
-		createdAt := model.NewCreatedAt(model.NewCreatedAt(model.NewModelTime(todo.CreatedAt)))
-		todoModel := model.NewTodo(id, title, completed, lastUpdate, createdAt)
+		completed := domain.NewCompleted(todo.Completed)
+		lastUpdate := domain.NewLastUpdate(domain.NewLastUpdate(domain.NewModelTime(todo.LastUpdate)))
+		createdAt := domain.NewCreatedAt(domain.NewCreatedAt(domain.NewModelTime(todo.CreatedAt)))
+		todoModel := domain.NewTodo(id, title, completed, lastUpdate, createdAt)
 		todoModels = append(todoModels, todoModel)
 	}
 	return todoModels, nil
 }
 
 // FindByIDはIDを指定してTodoを取得します。
-func (t *TodoRepository) FindByID(id uint64) (*model.Todo, error) {
+func (t *TodoRepository) FindByID(id uint64) (*domain.Todo, error) {
 	todo := new(Todo)
 	err := t.db.NewSelect().Model(todo).Where("id = ?", id).Scan(context.TODO())
 	if err != nil {
@@ -78,21 +78,21 @@ func (t *TodoRepository) FindByID(id uint64) (*model.Todo, error) {
 	return todoModel, nil
 }
 
-func convertToTodoModel(todo *Todo) (*model.Todo, error) {
-	id := model.NewID(todo.ID)
-	title, err := model.NewTitle(todo.Title)
+func convertToTodoModel(todo *Todo) (*domain.Todo, error) {
+	id := domain.NewID(todo.ID)
+	title, err := domain.NewTitle(todo.Title)
 	if err != nil {
 		return nil, fmt.Errorf("title is invalid: %w", err)
 	}
-	completed := model.NewCompleted(todo.Completed)
-	lastUpdate := model.NewLastUpdate(model.NewLastUpdate(model.NewModelTime(todo.LastUpdate)))
-	createdAt := model.NewCreatedAt(model.NewCreatedAt(model.NewModelTime(todo.CreatedAt)))
-	todoModel := model.NewTodo(id, title, completed, lastUpdate, createdAt)
+	completed := domain.NewCompleted(todo.Completed)
+	lastUpdate := domain.NewLastUpdate(domain.NewLastUpdate(domain.NewModelTime(todo.LastUpdate)))
+	createdAt := domain.NewCreatedAt(domain.NewCreatedAt(domain.NewModelTime(todo.CreatedAt)))
+	todoModel := domain.NewTodo(id, title, completed, lastUpdate, createdAt)
 	return todoModel, nil
 }
 
 // CreateはTodoを作成します。
-func (t *TodoRepository) Create(todoModel *model.Todo) error {
+func (t *TodoRepository) Create(todoModel *domain.Todo) error {
 	todo := convertToTodo(todoModel)
 	_, err := t.db.NewInsert().Model(todo).Exec(context.TODO())
 	if err != nil {
@@ -101,7 +101,7 @@ func (t *TodoRepository) Create(todoModel *model.Todo) error {
 	return nil
 }
 
-func convertToTodo(todoModel *model.Todo) *Todo {
+func convertToTodo(todoModel *domain.Todo) *Todo {
 	return &Todo{
 		ID:         uint64(todoModel.ID),
 		Title:      todoModel.Title.AsGoString(),
@@ -112,7 +112,7 @@ func convertToTodo(todoModel *model.Todo) *Todo {
 }
 
 // UpdateはTodoを更新します。
-func (t *TodoRepository) Update(todoModel *model.Todo) error {
+func (t *TodoRepository) Update(todoModel *domain.Todo) error {
 	todo := convertToTodo(todoModel)
 	_, err := t.db.NewUpdate().Model(todo).WherePK().Exec(context.TODO())
 	if err != nil {
@@ -122,7 +122,7 @@ func (t *TodoRepository) Update(todoModel *model.Todo) error {
 }
 
 // DeleteはTodoを削除します。
-func (t *TodoRepository) Delete(todoModel *model.Todo) error {
+func (t *TodoRepository) Delete(todoModel *domain.Todo) error {
 	todo := convertToTodo(todoModel)
 	_, err := t.db.NewDelete().Model(todo).WherePK().Exec(context.TODO())
 	if err != nil {
