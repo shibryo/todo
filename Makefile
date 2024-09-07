@@ -1,11 +1,15 @@
+# setup
+setup:
+	go mod vendor
+
 # generate swagger
 swagger:
-	swag init
+	swag init -g cmd/todoApp/main.go
 
 # run server
 run:
-	swag init
-	go run main.go
+	make swagger
+	go run cmd/todoApp/main.go
 
 # run test
 test:
@@ -19,3 +23,4 @@ lint:
 coverage:
 	go test -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out
+
