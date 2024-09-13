@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	app "todo/internal/app"
+	"todo/internal/di"
 	model "todo/internal/domain"
 	repository "todo/internal/infra"
 
@@ -128,10 +130,11 @@ func(ctrl *TodoController) CreateTodo() echo.HandlerFunc {
 			model.NewLastUpdate(model.NewModelTime(time.Now())),
 			model.NewCreatedAt(model.NewModelTime(time.Now())),
 		)
-
-		err = ctrl.todoRepository.Create(todo)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err)
+		repository, err := di.NewDITodoController()
+		service := app.NewTodoCommandService(repository)
+		shouldReturn, returnValue := service.CreateTodoCommand(todo ,c)
+		if shouldReturn {
+			return returnValue
 		}
 
 		resultTodoView := TodoView{
@@ -144,6 +147,8 @@ func(ctrl *TodoController) CreateTodo() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, resultTodoView)
 	}
 }
+
+
 
 // UpdateTodo godoc
 // @Summary Update todo
