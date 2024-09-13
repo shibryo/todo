@@ -212,15 +212,11 @@ func(ctrl *TodoController) DeleteTodo() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, err)
 		}
-
-		todo := model.NewTodo(
-			model.NewID(id),
-			nil,
-			nil,
-			nil,
-			nil,
-		)
-
+		todo, err := ctrl.todoRepository.FindByID(id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+		// 削除処理の振る舞いをModelに委譲する
 		err = ctrl.todoRepository.Delete(todo)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
