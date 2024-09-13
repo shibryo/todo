@@ -1,4 +1,4 @@
-package controller
+package view
 
 import (
 	"log/slog"
@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 	app "todo/internal/app"
-	"todo/internal/di"
 	model "todo/internal/domain"
 	repository "todo/internal/infra"
 
@@ -26,8 +25,7 @@ type TodoController struct {
 }
 
 func NewTodoController(todoRepository repository.TodoRepositorier) *TodoController {
-	c := &TodoController{ todoRepository: todoRepository }
-	return c
+	return &TodoController{ todoRepository: todoRepository }
 }
 
 // GetHello godoc
@@ -130,8 +128,7 @@ func(ctrl *TodoController) CreateTodo() echo.HandlerFunc {
 			model.NewLastUpdate(model.NewModelTime(time.Now())),
 			model.NewCreatedAt(model.NewModelTime(time.Now())),
 		)
-		repository, err := di.NewDITodoController()
-		service := app.NewTodoCommandService(repository)
+		service := app.NewTodoCommandService(ctrl.todoRepository)
 		shouldReturn, returnValue := service.CreateTodoCommand(todo ,c)
 		if shouldReturn {
 			return returnValue

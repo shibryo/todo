@@ -1,4 +1,4 @@
-package repository_test
+package infra_test
 
 import (
 	"context"
