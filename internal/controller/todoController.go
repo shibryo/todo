@@ -161,24 +161,26 @@ func(ctrl *TodoController) UpdateTodo() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, err)
 		}
-
 		todoView := new(TodoView)
 		if err := c.Bind(todoView); err != nil {
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
-		title, err := model.NewTitle(todoView.Title)
+		todo, err := ctrl.todoRepository.FindByID(id)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(http.StatusInternalServerError, err)
 		}
 
-		todo := model.NewTodo(
-			model.NewID(id),
-			title,
-			model.NewCompleted(todoView.Completed),
-			model.NewLastUpdate(model.NewModelTime(time.Now())),
-			model.NewCreatedAt(model.NewModelTime(time.Now())),
-		)
+		if todo.Title.AsGoString() != todoView.Title {
+			title, err := model.NewTitle(todoView.Title)
+			if err != nil {
+				return c.JSON(http.StatusBadRequest, err)
+			}
+			todo.UpdateTitle(title)
+		}
+		if todo.Completed.AsGoBool() != todoView.Completed {
+			todo.ToggleCompleted()
+		}
 
 		err = ctrl.todoRepository.Update(todo)
 		if err != nil {
