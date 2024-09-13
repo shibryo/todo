@@ -46,6 +46,8 @@ https://scrapbox.io/kawasima/%E3%83%87%E3%83%BC%E3%82%BF%E8%A9%B0%E3%82%81%E6%9B
 
 
 ## 「計算と判定のモデル」と「データの記録と参照」を分ける
+TodoアプリのControllerでは永続化の機能をRepositoryに任せている。
+計算と判定はModelが行うので以下のコードのように永続化したデータを参照してからユースケースの実行をし、結果を永続化している。
 
 ```go
 func(ctrl *TodoController) UpdateTodo() echo.HandlerFunc {
@@ -53,18 +55,31 @@ func(ctrl *TodoController) UpdateTodo() echo.HandlerFunc {
         id, err := strconv.ParseUint(c.Param("id"), 10, 64)
         // ....
 
+        // データの参照
+		todo, err := ctrl.todoRepository.FindByID(id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+
+        // 計算と判定のモデルをユースケースに沿って実行
+		if todo.Title.AsGoString() != todoView.Title {
+			title, err := model.NewTitle(todoView.Title)
+			if err != nil {
+				return c.JSON(http.StatusBadRequest, err)
+			}
+			todo.UpdateTitle(title)
+		}
+		if todo.Completed.AsGoBool() != todoView.Completed {
+			todo.ToggleCompleted()
+		}
+
+        // データの記録
 		err = ctrl.todoRepository.Update(todo)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
 
-		resultTodoView := TodoView{
-			ID:         uint64(todo.ID),
-			Title:      todo.Title.AsGoString(),
-			Completed:  todo.Completed.AsGoBool(),
-			LastUpdate: todo.LastUpdate.AsGoString(),
-			CreatedAt:  todo.CreatedAt.AsGoString(),
-		}
+        // ....
 		return c.JSON(http.StatusOK, resultTodoView)
 	}
 }
