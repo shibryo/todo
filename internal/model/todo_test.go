@@ -25,7 +25,7 @@ func Test_Titleが101文字の時に作成できない(t *testing.T) {
 	
 	_, err := model.NewTitle(word)
 
-	assert.Equal(t, err.Error(), "title is too long")
+	assert.Equal(t, err.Error(), "title is too long: 101")
 }
 
 func Test_Titleが空文字の時に作成できない(t *testing.T) {
