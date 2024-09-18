@@ -53,6 +53,7 @@ func(ctrl *TodoController) FindAllTodo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		todos, err := ctrl.todoRepository.FindAll()
 		if err != nil {
+			slog.Error("failed to find all todos", "err", err, "todos", todos)
 			return c.JSON(http.StatusInternalServerError, err)
 		}
 		todoViews := make([]TodoView, 0, len(todos))
@@ -82,10 +83,12 @@ func(ctrl *TodoController) FindTodoByID() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {
+			slog.Error("failed to parse id", "err", err, "id", c.Param("id"))
 			return c.JSON(http.StatusBadRequest, err)
 		}
 		todo, err := ctrl.todoRepository.FindByID(id)
 		if err != nil {
+			slog.Error("failed to find todo by id", "err", err, "id", id)
 			return c.JSON(http.StatusInternalServerError, err)
 		}
 		todoView := TodoView{
@@ -112,12 +115,13 @@ func(ctrl *TodoController) CreateTodo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		todoView := new(TodoView)
 		if err := c.Bind(todoView); err != nil {
-			slog.Info("bind error", "err",err)
+			slog.Error("failed to bind todo", "err", err, "todo", todoView)
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
 		title, err := model.NewTitle(todoView.Title)
 		if err != nil {
+			slog.Error("title is invalid", "err", err, "title", todoView.Title)
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
@@ -131,6 +135,7 @@ func(ctrl *TodoController) CreateTodo() echo.HandlerFunc {
 
 		err = ctrl.todoRepository.Create(todo)
 		if err != nil {
+			slog.Error("failed to create todo", "err", err, "todo", todo)
 			return c.JSON(http.StatusInternalServerError, err)
 		}
 
@@ -159,21 +164,25 @@ func(ctrl *TodoController) UpdateTodo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {
+			slog.Error("failed to parse id", "err", err, "id", c.Param("id"))
 			return c.JSON(http.StatusBadRequest, err)
 		}
 		todoView := new(TodoView)
 		if err := c.Bind(todoView); err != nil {
+			slog.Error("failed to bind todo", "err", err, "todo", todoView)
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
 		todo, err := ctrl.todoRepository.FindByID(id)
 		if err != nil {
+			slog.Error("failed to find todo by id", "err", err, "id", id)
 			return c.JSON(http.StatusInternalServerError, err)
 		}
 
 		if todo.Title.AsGoString() != todoView.Title {
 			title, err := model.NewTitle(todoView.Title)
 			if err != nil {
+				slog.Error("title is invalid", "err", err, "title", todoView.Title)
 				return c.JSON(http.StatusBadRequest, err)
 			}
 			todo.UpdateTitle(title)
@@ -184,6 +193,7 @@ func(ctrl *TodoController) UpdateTodo() echo.HandlerFunc {
 
 		err = ctrl.todoRepository.Update(todo)
 		if err != nil {
+			slog.Error("failed to update todo", "err", err, "todo", todo)
 			return c.JSON(http.StatusInternalServerError, err)
 		}
 
@@ -210,15 +220,18 @@ func(ctrl *TodoController) DeleteTodo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {
+			slog.Error("failed to parse id", "err", err, "id", c.Param("id"))
 			return c.JSON(http.StatusBadRequest, err)
 		}
 		todo, err := ctrl.todoRepository.FindByID(id)
 		if err != nil {
+			slog.Error("failed to find todo by id", "err", err, "id", id)
 			return c.JSON(http.StatusInternalServerError, err)
 		}
 		// 削除処理の振る舞いをModelに委譲する
 		err = ctrl.todoRepository.Delete(todo)
 		if err != nil {
+			slog.Error("failed to delete todo", "err", err, "todo", todo)
 			return c.JSON(http.StatusInternalServerError, err)
 		}
 

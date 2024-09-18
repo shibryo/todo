@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log/slog"
+	"os"
+
 	echoSwagger "github.com/swaggo/echo-swagger"
 
 	_ "todo/docs"
@@ -29,8 +32,14 @@ import (
 // @host localhost:8080
 // @BasePath /api/v1
 func main() {
+	// slogの初期化 json形式でログを出力
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
+
 	c, err := di.NewDITodoController()
 	if err != nil {
+		slog.Debug("failed to create controller", "err", err)
 		panic(err)
 	}
 

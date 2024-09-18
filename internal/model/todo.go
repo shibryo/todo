@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"log/slog"
 	"time"
 )
 
@@ -17,10 +18,12 @@ type Title struct {
 
 func NewTitle(text string) (*Title, error) {
 	if len(text) == 0 {
+		slog.Error("title is empty", "text", text)
 		return nil, fmt.Errorf("title is empty")
 	}
 	if len(text) > 100 {
-		return nil, fmt.Errorf("title is too long")
+		slog.Error("title is too long", "text", text, "len", len(text))
+		return nil, fmt.Errorf("title is too long: %d", len(text))
 	}
 
 	return &Title{text: text}, nil

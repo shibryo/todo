@@ -3,6 +3,7 @@ package di
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log/slog"
 	"os"
 	"todo/internal/controller"
@@ -21,12 +22,13 @@ type config struct {
 func getEnv()  (config, error) {
 	err := godotenv.Load()
 	if err != nil {
-		return config{}, err
+		slog.Error("failed to load .env file", "err", err)
+		return config{}, fmt.Errorf("failed to load .env file: %w", err)
 	}
 	c := config{
 		DSN: os.Getenv("DSN"),
 	}
-	slog.Info("getEnv", "c", c)
+	slog.Debug("getEnv", "c", c)
 	return c, nil
 }
 
@@ -40,7 +42,8 @@ func NewDITodoRepository(dsn string) (repository.TodoRepositorier, error) {
 		IfNotExists().
 		Exec(context.TODO())
 	if err != nil {	
-		return nil, err
+		slog.Error("failed to create table", "err", err)
+		return nil, fmt.Errorf("failed to create table: %w", err)
 	}
 	todoRepository := repository.NewTodoRepository(db)
 	return todoRepository, nil
@@ -50,12 +53,14 @@ func NewDITodoRepository(dsn string) (repository.TodoRepositorier, error) {
 func NewDITodoController() (*controller.TodoController, error) {
 	cnf, err := getEnv()
 	if err != nil {
-		return nil, err
+		slog.Error("failed to get env", "err", err)
+		return nil, fmt.Errorf("failed to get env: %w", err)
 	}
 	dsn := cnf.DSN
 	todoRepository, err := NewDITodoRepository(dsn)
 	if err != nil {
-		return nil, err
+		slog.Error("failed to create todo repository", "err", err)
+		return nil, fmt.Errorf("failed to create todo repository: %w", err)
 	}
 	c := controller.NewTodoController(todoRepository)
 	return c, nil

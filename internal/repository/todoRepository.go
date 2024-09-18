@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"time"
 	"todo/internal/model"
 
@@ -38,11 +39,12 @@ func (t *TodoRepository) FindAll() ([]*model.Todo, error) {
 	var todos []*Todo
 	err := t.db.NewSelect().Model(&todos).Scan(context.TODO())
 	if err != nil {
-		return nil, err
+		slog.Error("todos are not found", "err", err, "todos", todos)
+		return nil, fmt.Errorf("todos are not found: %w", err)
 	}
 	todoModels, err := convertToTodoModels(todos)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("todos are invalid: %w", err)
 	}
 	return todoModels, nil
 }
@@ -53,6 +55,7 @@ func convertToTodoModels(todos []*Todo) ([]*model.Todo, error) {
 		id := model.NewID(todo.ID)
 		title, err := model.NewTitle(todo.Title)
 		if err != nil {
+			slog.Error("title is invalid","err", err, "todo", todo)
 			return nil, fmt.Errorf("title is invalid: %w", err)
 		}
 		completed := model.NewCompleted(todo.Completed)
@@ -69,11 +72,11 @@ func (t *TodoRepository) FindByID(id uint64) (*model.Todo, error) {
 	todo := new(Todo)
 	err := t.db.NewSelect().Model(todo).Where("id = ?", id).Scan(context.TODO())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("todo is not found: %w", err, "id", id)
 	}
 	todoModel, err := convertToTodoModel(todo)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("todo is invalid: %w", err, "todo", todo)
 	}
 	return todoModel, nil
 }
@@ -82,6 +85,7 @@ func convertToTodoModel(todo *Todo) (*model.Todo, error) {
 	id := model.NewID(todo.ID)
 	title, err := model.NewTitle(todo.Title)
 	if err != nil {
+		slog.Error("title is invalid","err", err, "todo", todo)
 		return nil, fmt.Errorf("title is invalid: %w", err)
 	}
 	completed := model.NewCompleted(todo.Completed)
@@ -96,7 +100,8 @@ func (t *TodoRepository) Create(todoModel *model.Todo) error {
 	todo := convertToTodo(todoModel)
 	_, err := t.db.NewInsert().Model(todo).Exec(context.TODO())
 	if err != nil {
-		return err
+		slog.Error("todo is invalid", "err",err, "todo", todo)
+		return fmt.Errorf("todo is invalid: %w", err)
 	}
 	return nil
 }
@@ -116,7 +121,8 @@ func (t *TodoRepository) Update(todoModel *model.Todo) error {
 	todo := convertToTodo(todoModel)
 	_, err := t.db.NewUpdate().Model(todo).WherePK().Exec(context.TODO())
 	if err != nil {
-		return err
+		slog.Error("todo is invalid", "err",err, "todo", todo)
+		return fmt.Errorf("todo is invalid: %w", err)
 	}
 	return nil
 }
@@ -126,7 +132,8 @@ func (t *TodoRepository) Delete(todoModel *model.Todo) error {
 	todo := convertToTodo(todoModel)
 	_, err := t.db.NewDelete().Model(todo).WherePK().Exec(context.TODO())
 	if err != nil {
-		return err
+		slog.Error("todo is invalid", "err",err, "todo", todo)
+		return fmt.Errorf("todo is invalid: %w", err)
 	}
 	return nil
 }
