@@ -89,12 +89,18 @@ func (c CreatedAt) AsGoTime() time.Time {
 	return c.date.AsGoTime()
 }
 
+// Todoモデル
 type Todo struct {
 	ID         ID 	   `bun:"id"`
 	Title      Title       `bun:"title"`
 	Completed  Completed   `bun:"completed"`
 	LastUpdate LastUpdate  `bun:"last_update"`
 	CreatedAt  CreatedAt   `bun:"created_at"`
+}
+
+// 削除専用のモデル
+type DeletableID struct {
+	ID ID 
 }
 
 func NewTodo(id ID, title *Title, completed *Completed, lastUpdate *LastUpdate, createdAt *CreatedAt) *Todo {
@@ -125,4 +131,8 @@ func (t *Todo) ToIncompleted() {
 
 func (t *Todo) UpdateLastUpdate(now ModelTimer) {
 	t.LastUpdate = *NewLastUpdate(now)
+}
+
+func (t * Todo) Delete() *DeletableID {
+	return &DeletableID{ID: t.ID}
 }

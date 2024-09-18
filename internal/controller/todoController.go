@@ -228,8 +228,9 @@ func(ctrl *TodoController) DeleteTodo() echo.HandlerFunc {
 			slog.Error("failed to find todo by id", "err", err, "id", id)
 			return c.JSON(http.StatusInternalServerError, err)
 		}
-		// 削除処理の振る舞いをModelに委譲する
-		err = ctrl.todoRepository.Delete(todo)
+		deletedTodo := todo.Delete()
+
+		err = ctrl.todoRepository.Delete(deletedTodo)
 		if err != nil {
 			slog.Error("failed to delete todo", "err", err, "todo", todo)
 			return c.JSON(http.StatusInternalServerError, err)

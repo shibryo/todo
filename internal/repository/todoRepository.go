@@ -20,13 +20,15 @@ type Todo struct {
 	CreatedAt  time.Time `bun:"created_at,notnull,default:current_timestamp"`
 }
 
+
+
 // TodoRepositorierはTodoのリポジトリインターフェースです。
 type TodoRepositorier interface {
 	FindAll() ([]*model.Todo, error)
 	FindByID(id uint64) (*model.Todo, error)
 	Create(todoModel *model.Todo) error
 	Update(todoModel *model.Todo) error
-	Delete(todoModel *model.Todo) error
+	Delete(todoModel *model.DeletableID) error
 }
 
 // TodoRepositoryはTodoのリポジトリ構造体です。
@@ -72,11 +74,11 @@ func (t *TodoRepository) FindByID(id uint64) (*model.Todo, error) {
 	todo := new(Todo)
 	err := t.db.NewSelect().Model(todo).Where("id = ?", id).Scan(context.TODO())
 	if err != nil {
-		return nil, fmt.Errorf("todo is not found: %w", err, "id", id)
+		return nil, fmt.Errorf("todo is not found: %w id=%d", err, id)
 	}
 	todoModel, err := convertToTodoModel(todo)
 	if err != nil {
-		return nil, fmt.Errorf("todo is invalid: %w", err, "todo", todo)
+		return nil, fmt.Errorf("todo is invalid: %w id=%d", err, id)
 	}
 	return todoModel, nil
 }
@@ -86,7 +88,7 @@ func convertToTodoModel(todo *Todo) (*model.Todo, error) {
 	title, err := model.NewTitle(todo.Title)
 	if err != nil {
 		slog.Error("title is invalid","err", err, "todo", todo)
-		return nil, fmt.Errorf("title is invalid: %w", err)
+		return nil, fmt.Errorf("title is invalid: %w id=%d", err, todo.ID)
 	}
 	completed := model.NewCompleted(todo.Completed)
 	lastUpdate := model.NewLastUpdate(model.NewLastUpdate(model.NewModelTime(todo.LastUpdate)))
@@ -101,9 +103,15 @@ func (t *TodoRepository) Create(todoModel *model.Todo) error {
 	_, err := t.db.NewInsert().Model(todo).Exec(context.TODO())
 	if err != nil {
 		slog.Error("todo is invalid", "err",err, "todo", todo)
-		return fmt.Errorf("todo is invalid: %w", err)
+		return fmt.Errorf("todo is invalid: %w id=%d", err, todo.ID)
 	}
 	return nil
+}
+
+func convertDeletedTodoToTodo(deletedTodo *model.DeletableID) *Todo {
+	return &Todo{
+		ID: uint64(deletedTodo.ID),
+	}
 }
 
 func convertToTodo(todoModel *model.Todo) *Todo {
@@ -122,18 +130,18 @@ func (t *TodoRepository) Update(todoModel *model.Todo) error {
 	_, err := t.db.NewUpdate().Model(todo).WherePK().Exec(context.TODO())
 	if err != nil {
 		slog.Error("todo is invalid", "err",err, "todo", todo)
-		return fmt.Errorf("todo is invalid: %w", err)
+		return fmt.Errorf("todo is invalid: %w id=%d", err, todo.ID)
 	}
 	return nil
 }
 
 // DeleteはTodoを削除します。
-func (t *TodoRepository) Delete(todoModel *model.Todo) error {
-	todo := convertToTodo(todoModel)
+func (t *TodoRepository) Delete(deletedTodo *model.DeletableID) error {
+	todo := convertDeletedTodoToTodo(deletedTodo)
 	_, err := t.db.NewDelete().Model(todo).WherePK().Exec(context.TODO())
 	if err != nil {
 		slog.Error("todo is invalid", "err",err, "todo", todo)
-		return fmt.Errorf("todo is invalid: %w", err)
+		return fmt.Errorf("todo is invalid: %w id=%d", err, todo.ID)
 	}
 	return nil
 }

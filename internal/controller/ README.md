@@ -88,3 +88,15 @@ func(ctrl *TodoController) UpdateTodo() echo.HandlerFunc {
 参考：
 ドメイン駆動設計を理解する３つのキーワード
 https://masuda220.hatenablog.com/entry/2019/03/04/144154
+
+
+## 削除専用のDeletableIDを用意してRepositoryの引数にする
+はじめに実装した時に削除の振る舞いがModelから漏れ出ていることに気づいた。
+ブログに従い、削除可能な場合はDeletableIDを返すようにした。
+
+メリットとして、必ず削除を行うときはDeletableIDを渡す必要があるのでロジックが外に漏れづらい
+
+
+参考：
+削除のビジネスロジックをドメイン層に閉じ込める簡単で強力な「DeletableIDパターン」の紹介
+https://zenn.dev/loglass/articles/c5f57be65d4640#%E3%82%B9%E3%83%86%E3%83%83%E3%83%972%3A-%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA%E3%81%AE%E5%89%8A%E9%99%A4%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89%E3%81%AFdeletableid%E3%81%AE%E5%9E%8B%E3%81%97%E3%81%8B%E5%8F%97%E3%81%91%E5%8F%96%E3%82%89%E3%81%AA%E3%81%84%E3%82%88%E3%81%86%E3%81%AB%E3%81%99%E3%82%8B
