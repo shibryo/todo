@@ -25,6 +25,8 @@ fix:
 
 # coverage html
 coverage:
-	go test -coverprofile=coverage.out ./...
+	go test -coverprofile=coverage.out   ./... 
+	grep -v "/mock/" coverage.out > tmp.out
+	mv tmp.out coverage.out
 	go tool cover -html=coverage.out -o coverage.html
 
