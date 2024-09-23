@@ -5,14 +5,15 @@ import (
 	"testing"
 	"time"
 
+	app "todo/internal/app"
+	di "todo/internal/di"
+	domain "todo/internal/domain"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
-	app "todo/internal/app"
-	di "todo/internal/di"
-	domain "todo/internal/domain"
 )
 
 func SetupDB(t *testing.T) string {
@@ -119,10 +120,10 @@ func TestDeleteTodoCommand_Todoを作成してからTodo削除が成功する(t 
 	err = service.DeleteTodoCommand(todoIDData)
 	require.NoError(t, err)
 
-	got, err := repository.FindByID(id)
-	require.NoError(t, err)
-	assert.Equal(t, domain.NewID(1), got.ID)
-	assert.Equal(t, "title", got.Title.AsGoString())
+	_, err = repository.FindByID(id)
+	require.Error(t, err)
+
+	assert.Contains(t, err.Error(), "failed to get todo")
 }
 
 func TestFindAllCommand_Todoが2件取得できる(t *testing.T) {
