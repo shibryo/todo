@@ -19,6 +19,10 @@ test:
 lint:
 	golangci-lint run
 
+# fix
+fix:
+	golangci-lint run --fix
+
 # coverage html
 coverage:
 	go test -coverprofile=coverage.out ./...

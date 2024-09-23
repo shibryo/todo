@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 	"time"
+
 	"todo/internal/app"
 	"todo/internal/di"
 	"todo/internal/domain"
@@ -14,7 +15,7 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-func SetupDB(t *testing.T) string{
+func SetupDB(t *testing.T) string {
 	// Setup
 	ctx := context.Background()
 
@@ -53,6 +54,7 @@ func NewTestTodoRepository(t *testing.T) (app.TodoRepositorier, error) {
 	}
 	return repository, nil
 }
+
 func TestTodoRepository_FindAll(t *testing.T) {
 	t.Parallel()
 	repository, err := NewTestTodoRepository(t)
@@ -61,7 +63,7 @@ func TestTodoRepository_FindAll(t *testing.T) {
 	}
 
 	// set data
-	text , err := domain.NewTitle("test")
+	text, err := domain.NewTitle("test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -93,7 +95,7 @@ func Test_Todoが2件取得できる(t *testing.T) {
 	}
 
 	// set 2data
-	text1 , err := domain.NewTitle("test")
+	text1, err := domain.NewTitle("test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,7 +111,7 @@ func Test_Todoが2件取得できる(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	text2 , err := domain.NewTitle("test")
+	text2, err := domain.NewTitle("test")
 	if err != nil {
 		t.Fatal(err)
 	}

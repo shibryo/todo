@@ -4,17 +4,17 @@ import (
 	"context"
 	"testing"
 	"time"
-	"todo/internal/app"
-	"todo/internal/di"
-	"todo/internal/domain"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"todo/internal/app"
+	"todo/internal/di"
+	"todo/internal/domain"
 )
 
-func SetupDB(t *testing.T) string{
+func SetupDB(t *testing.T) string {
 	// Setup
 	ctx := context.Background()
 
@@ -45,7 +45,6 @@ func SetupDB(t *testing.T) string{
 	return connStr
 }
 
-
 func TestCreateTodoCommand_Todo作成が成功する(t *testing.T) {
 	t.Parallel()
 	dsn := SetupDB(t)
@@ -59,8 +58,6 @@ func TestCreateTodoCommand_Todo作成が成功する(t *testing.T) {
 	err = service.CreateTodoCommand(todoData)
 	assert.NoError(t, err)
 }
-
-
 
 func TestUpdateTodoCommand_Todoを作成してからTodo更新が成功する(t *testing.T) {
 	t.Parallel()
@@ -76,9 +73,9 @@ func TestUpdateTodoCommand_Todoを作成してからTodo更新が成功する(t 
 		t.Fatal(err)
 	}
 	id := uint64(1)
-	oldTodo := domain.NewTodo(domain.NewID(id), *title, 
-		domain.NewCompleted(false), 
-		domain.NewLastUpdate(domain.NewDomainTime(time.Now())), 
+	oldTodo := domain.NewTodo(domain.NewID(id), *title,
+		domain.NewCompleted(false),
+		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
 		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
 	)
 	err = repository.Create(oldTodo)
@@ -166,7 +163,6 @@ func TestFindAllCommand_Todoが2件取得できる(t *testing.T) {
 	todos, err := service.FindAllCommand()
 	assert.NoError(t, err)
 	assert.Len(t, todos, 2)
-
 }
 
 func TestFindByIdCommand_IDを指定してTodoが取得できる(t *testing.T) {

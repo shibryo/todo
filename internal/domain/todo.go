@@ -10,6 +10,7 @@ type ID uint64
 func NewID(id uint64) ID {
 	return ID(id)
 }
+
 func (i ID) AsGoUint64() uint64 {
 	return uint64(i)
 }
@@ -90,11 +91,11 @@ func (c CreatedAt) AsGoTime() time.Time {
 }
 
 type Todo struct {
-	ID         ID 	   `bun:"id"`
-	Title      Title       `bun:"title"`
-	Completed  Completed   `bun:"completed"`
-	LastUpdate LastUpdate  `bun:"last_update"`
-	CreatedAt  CreatedAt   `bun:"created_at"`
+	ID         ID         `bun:"id"`
+	Title      Title      `bun:"title"`
+	Completed  Completed  `bun:"completed"`
+	LastUpdate LastUpdate `bun:"last_update"`
+	CreatedAt  CreatedAt  `bun:"created_at"`
 }
 
 func NewTodo(id ID, title Title, completed Completed, lastUpdate LastUpdate, createdAt CreatedAt) *Todo {

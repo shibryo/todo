@@ -4,37 +4,37 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
-	app "todo/internal/app"
 
 	"github.com/labstack/echo/v4"
+	app "todo/internal/app"
 )
 
 // TodoResponseViewはTodoのレスポンスビューです。
 type TodoResponseView struct {
 	ID         uint64 `json:"id"`
 	Title      string `json:"title"`
-	Completed  bool   `json:"completed" default:"false"`
+	Completed  bool   `default:"false"    json:"completed"`
 	LastUpdate string `json:"last_update"`
 	CreatedAt  string `json:"created_at"`
 }
 
 // TodoRequestViewはTodoのリクエストビューです。
-type TodoRequestView struct { 
-	Title string `json:"title"`
-	Completed bool `json:"completed"`
+type TodoRequestView struct {
+	Title     string `json:"title"`
+	Completed bool   `json:"completed"`
 }
 
 // TodoControllerはTodoのコントローラーです。
 type TodoController struct {
 	todoComandService app.TodoComandService
-	todoRepository app.TodoRepositorier
+	todoRepository    app.TodoRepositorier
 }
 
 // NewTodoControllerはTodoのコントローラーを生成します。
 func NewTodoController(todoComandService app.TodoComandService, todoRepository app.TodoRepositorier) *TodoController {
 	return &TodoController{
 		todoComandService: todoComandService,
-		todoRepository: todoRepository,
+		todoRepository:    todoRepository,
 	}
 }
 
@@ -44,12 +44,12 @@ func NewTodoController(todoComandService app.TodoComandService, todoRepository a
 // @ID get-hello
 // @Produce  plain
 // @Success 200 {string} string "Hello, World!"
-// @Router / [get]
-func(ctrl *TodoController) GetHello() echo.HandlerFunc {
+// @Router / [get].
+func (ctrl *TodoController) GetHello() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	}
-	
+
 }
 
 // FindAllTodo godoc
@@ -58,8 +58,8 @@ func(ctrl *TodoController) GetHello() echo.HandlerFunc {
 // @ID find-all-todos
 // @Produce  json
 // @Success 200 {array} TodoResponseView
-// @Router /todos [get]
-func(ctrl *TodoController) FindAllTodo() echo.HandlerFunc {
+// @Router /todos [get].
+func (ctrl *TodoController) FindAllTodo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		todos, err := ctrl.todoComandService.FindAllCommand()
 		if err != nil {
@@ -88,8 +88,8 @@ func(ctrl *TodoController) FindAllTodo() echo.HandlerFunc {
 // @Produce  json
 // @Param id path int true "Todo ID"
 // @Success 200 {object} TodoResponseView
-// @Router /todos/{id} [get]
-func(ctrl *TodoController) FindTodoByID() echo.HandlerFunc {
+// @Router /todos/{id} [get].
+func (ctrl *TodoController) FindTodoByID() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {
@@ -121,12 +121,12 @@ func(ctrl *TodoController) FindTodoByID() echo.HandlerFunc {
 // @Produce  json
 // @Param todo body TodoRequestView true "Todo"
 // @Success 200 {object} string
-// @Router /todos [post]
-func(ctrl *TodoController) CreateTodo() echo.HandlerFunc {
+// @Router /todos [post].
+func (ctrl *TodoController) CreateTodo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		todoRequestView := new(TodoRequestView)
 		if err := c.Bind(todoRequestView); err != nil {
-			slog.Info("bind error", "err",err)
+			slog.Info("bind error", "err", err)
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
@@ -139,8 +139,6 @@ func(ctrl *TodoController) CreateTodo() echo.HandlerFunc {
 	}
 }
 
-
-
 // UpdateTodo godoc
 // @Summary Update todo
 // @Description update todo
@@ -150,8 +148,8 @@ func(ctrl *TodoController) CreateTodo() echo.HandlerFunc {
 // @Param id path int true "Todo ID"
 // @Param todo body TodoRequestView true "Todo"
 // @Success 200 {object} string
-// @Router /todos/{id} [put]
-func(ctrl *TodoController) UpdateTodo() echo.HandlerFunc {
+// @Router /todos/{id} [put].
+func (ctrl *TodoController) UpdateTodo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {
@@ -179,8 +177,8 @@ func(ctrl *TodoController) UpdateTodo() echo.HandlerFunc {
 // @Produce  json
 // @Param id path int true "Todo ID"
 // @Success 200
-// @Router /todos/{id} [delete]
-func(ctrl *TodoController) DeleteTodo() echo.HandlerFunc {
+// @Router /todos/{id} [delete].
+func (ctrl *TodoController) DeleteTodo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {

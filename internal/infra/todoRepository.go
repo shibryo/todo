@@ -6,20 +6,20 @@ import (
 	"context"
 	"fmt"
 	"time"
-	"todo/internal/app"
-	"todo/internal/domain"
 
 	"github.com/uptrace/bun"
+	"todo/internal/app"
+	"todo/internal/domain"
 )
 
 // TodoはORMのモデルです。
 type Todo struct {
 	bun.BaseModel `bun:"table:todos"`
-	ID         uint64 `bun:"id,pk,autoincrement,unique,notnull"`
-	Title      string `bun:"title,notnull"`
-	Completed  bool  `bun:"completed,notnull,default:false"`
-	LastUpdate time.Time `bun:"last_update,notnull,default:current_timestamp"`
-	CreatedAt  time.Time `bun:"created_at,notnull,default:current_timestamp"`
+	ID            uint64    `bun:"id,pk,autoincrement,unique,notnull"`
+	Title         string    `bun:"title,notnull"`
+	Completed     bool      `bun:"completed,notnull,default:false"`
+	LastUpdate    time.Time `bun:"last_update,notnull,default:current_timestamp"`
+	CreatedAt     time.Time `bun:"created_at,notnull,default:current_timestamp"`
 }
 
 // TodoRepositoryはTodoのリポジトリ構造体です。

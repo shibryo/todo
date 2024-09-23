@@ -5,14 +5,14 @@ import (
 	"database/sql"
 	"log/slog"
 	"os"
-	"todo/internal/app"
-	infra "todo/internal/infra"
-	view "todo/internal/view"
 
 	"github.com/joho/godotenv"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
+	"todo/internal/app"
+	infra "todo/internal/infra"
+	view "todo/internal/view"
 )
 
 type config struct {
@@ -40,7 +40,7 @@ func NewDITodoRepository(dsn string) (app.TodoRepositorier, error) {
 		Model((*infra.Todo)(nil)).
 		IfNotExists().
 		Exec(context.TODO())
-	if err != nil {	
+	if err != nil {
 		return nil, err
 	}
 	todoRepository := infra.NewTodoRepository(db)
