@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	echoSwagger "github.com/swaggo/echo-swagger"
 
 	_ "todo/docs"
@@ -41,10 +43,13 @@ func main() {
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
 	  	  
-
+	// TODO: if env is production, remove this line
+	e.GET("/", func(c echo.Context) error {
+		return c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
+	})
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 	apiV1 := e.Group("/api/v1")
-	apiV1.GET("/", c.GetHello())
+	apiV1.GET("/hello", c.GetHello())
 	apiV1.GET("/todos", c.FindAllTodo())
 	apiV1.POST("/todos", c.CreateTodo())
 	apiV1.GET("/todos/:id", c.FindTodoByID())
