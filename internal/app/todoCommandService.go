@@ -91,8 +91,13 @@ func (t *TodoComandServiceImpl)UpdateTodoCommand(newTodo TodoData) error {
 
 // DeleteTodoCommandはTodoを削除します。
 func (t *TodoComandServiceImpl)DeleteTodoCommand(id TodoIDData) error {
-	deletableTodo := domain.NewDeletableTodo(domain.NewID(id.ID))
-	err := t.repository.Delete(deletableTodo)
+	oldTodo, err := t.repository.FindByID(id.ID)
+	if err != nil {
+		return fmt.Errorf("failed to find todo: %w", err)
+	}
+	deletableTodo := domain.NewDeletableTodo(oldTodo.ID)
+	
+	err = t.repository.Delete(deletableTodo)
 	if err != nil {
 		return fmt.Errorf("failed to delete todo: %w", err)
 	}

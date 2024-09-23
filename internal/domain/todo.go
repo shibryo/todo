@@ -125,6 +125,10 @@ func Create(id ID, title Title, completed Completed) *Todo {
 	}
 }
 
+func (t *Todo) Delete() *DeletableTodo {
+	return NewDeletableTodo(t.ID)
+}
+
 func (t *Todo) UpdateTitle(title *Title) {
 	t.Title = *title
 	t.UpdateLastUpdate(NewDomainTimeNow())
