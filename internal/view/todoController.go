@@ -11,7 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type TodoView struct {
+// TodoResponseViewはTodoのレスポンスビューです。
+type TodoResponseView struct {
 	ID         uint64 `json:"id"`
 	Title      string `json:"title"`
 	Completed  bool   `json:"completed" default:"false"`
@@ -19,16 +20,19 @@ type TodoView struct {
 	CreatedAt  string `json:"created_at"`
 }
 
+// TodoRequestViewはTodoのリクエストビューです。
 type TodoRequestView struct { 
 	Title string `json:"title"`
 	Completed bool `json:"completed"`
 }
 
+// TodoControllerはTodoのコントローラーです。
 type TodoController struct {
 	todoComandService app.TodoComandService
 	todoRepository infra.TodoRepositorier
 }
 
+// NewTodoControllerはTodoのコントローラーを生成します。
 func NewTodoController(todoComandService app.TodoComandService, todoRepository infra.TodoRepositorier) *TodoController {
 	return &TodoController{
 		todoComandService: todoComandService,
@@ -55,17 +59,18 @@ func(ctrl *TodoController) GetHello() echo.HandlerFunc {
 // @Description get all todos
 // @ID find-all-todos
 // @Produce  json
-// @Success 200 {array} TodoView
+// @Success 200 {array} TodoResponseView
 // @Router /todos [get]
 func(ctrl *TodoController) FindAllTodo() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		todos, err := ctrl.todoRepository.FindAll()
+		todos, err := ctrl.todoComandService.FindAllCommand()
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
-		todoViews := make([]TodoView, 0, len(todos))
+
+		todoViews := make([]TodoResponseView, 0, len(todos))
 		for _, todo := range todos {
-			todoView := TodoView{
+			todoView := TodoResponseView{
 				ID:         uint64(todo.ID),
 				Title:      todo.Title.AsGoString(),
 				Completed:  todo.Completed.AsGoBool(),
@@ -84,7 +89,7 @@ func(ctrl *TodoController) FindAllTodo() echo.HandlerFunc {
 // @ID find-todo-by-id
 // @Produce  json
 // @Param id path int true "Todo ID"
-// @Success 200 {object} TodoView
+// @Success 200 {object} TodoResponseView
 // @Router /todos/{id} [get]
 func(ctrl *TodoController) FindTodoByID() echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -92,11 +97,13 @@ func(ctrl *TodoController) FindTodoByID() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, err)
 		}
-		todo, err := ctrl.todoRepository.FindByID(id)
+
+		todo, err := ctrl.todoComandService.FindByIdCommand(id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
-		todoView := TodoView{
+
+		todoView := TodoResponseView{
 			ID:         uint64(todo.ID),
 			Title:      todo.Title.AsGoString(),
 			Completed:  todo.Completed.AsGoBool(),
