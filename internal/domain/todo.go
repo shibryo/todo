@@ -58,10 +58,10 @@ func (c Completed) ToIncompleted() *Completed {
 }
 
 type LastUpdate struct {
-	date ModelTimer
+	date DomainTimer
 }
 
-func NewLastUpdate(date ModelTimer) *LastUpdate {
+func NewLastUpdate(date DomainTimer) *LastUpdate {
 	return &LastUpdate{date: date}
 }
 
@@ -74,10 +74,10 @@ func (l LastUpdate) AsGoTime() time.Time {
 }
 
 type CreatedAt struct {
-	date ModelTimer
+	date DomainTimer
 }
 
-func NewCreatedAt(date ModelTimer) *CreatedAt {
+func NewCreatedAt(date DomainTimer) *CreatedAt {
 	return &CreatedAt{date: date}
 }
 
@@ -109,20 +109,29 @@ func NewTodo(id ID, title *Title, completed *Completed, lastUpdate *LastUpdate, 
 
 func (t *Todo) UpdateTitle(title *Title) {
 	t.Title = *title
+	t.UpdateLastUpdate(NewDomainTimeNow())
 }
 
 func (t *Todo) ToggleCompleted() {
 	t.Completed = t.Completed.Toggle()
+	t.UpdateLastUpdate(NewDomainTimeNow())
 }
 
 func (t *Todo) ToCompleted() {
 	t.Completed = *t.Completed.ToCompleted()
+	t.UpdateLastUpdate(NewDomainTimeNow())
 }
 
 func (t *Todo) ToIncompleted() {
 	t.Completed = *t.Completed.ToIncompleted()
+	t.UpdateLastUpdate(NewDomainTimeNow())
 }
 
-func (t *Todo) UpdateLastUpdate(now ModelTimer) {
+func (t *Todo) UpdateCompleted(completed *Completed) {
+	t.Completed = *completed
+	t.UpdateLastUpdate(NewDomainTimeNow())
+}
+
+func (t *Todo) UpdateLastUpdate(now DomainTimer) {
 	t.LastUpdate = *NewLastUpdate(now)
 }

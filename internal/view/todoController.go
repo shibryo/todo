@@ -4,7 +4,6 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
-	"time"
 	app "todo/internal/app"
 	"todo/internal/domain"
 	"todo/internal/infra"
@@ -133,8 +132,8 @@ func(ctrl *TodoController) CreateTodo() echo.HandlerFunc {
 			0,
 			title,
 			domain.NewCompleted(todoRequestView.Completed),
-			domain.NewLastUpdate(domain.NewModelTime(time.Now())),
-			domain.NewCreatedAt(domain.NewModelTime(time.Now())),
+			nil,
+			nil,
 		)
 		err = ctrl.todoComandService.CreateTodoCommand(todo)
 		if err != nil {
@@ -175,8 +174,8 @@ func(ctrl *TodoController) UpdateTodo() echo.HandlerFunc {
 			domain.NewID(id),
 			title,
 			domain.NewCompleted(todoRequestView.Completed),
-			domain.NewLastUpdate(domain.NewModelTime(time.Now())),
-			domain.NewCreatedAt(domain.NewModelTime(time.Now())),
+			nil,
+			nil,
 		)
 		err = ctrl.todoComandService.UpdateTodoCommand(todo)
 		if err != nil {

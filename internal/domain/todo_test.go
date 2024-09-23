@@ -43,11 +43,11 @@ func Test_CompleteをToggleすると値が反転する(t *testing.T) {
 	assert.Equal(t, completed_true.AsGoBool(), true)
 }
 
-func setupTodo() (*domain.Todo, domain.ModelTimer, ) {
+func setupTodo() (*domain.Todo, domain.DomainTimer, ) {
 	// ctrl := gomock.NewController(t)
 	// mock_timer := model_mock.NewMockModelTimer(ctrl)
 
-    now := domain.NewModelTime(time.Date(2024, 9, 4, 12, 0, 0, 0, time.Local))
+    now := domain.NewDomainTime(time.Date(2024, 9, 4, 12, 0, 0, 0, time.Local))
     text := "title"
     id := domain.NewID(1)
     title, _ := domain.NewTitle(text)
@@ -99,7 +99,7 @@ func Test_TodoのCompleteをToggleできる(t *testing.T) {
 func Test_TodoのLastUpdateを更新できる(t *testing.T) {
 	t.Parallel()
 	todo, _ := setupTodo()
-	now := domain.NewModelTime(time.Date(2024, 9, 4, 12, 0, 0, 0, time.Local))
+	now := domain.NewDomainTime(time.Date(2024, 9, 4, 12, 0, 0, 0, time.Local))
 
 	todo.UpdateLastUpdate(now)
 

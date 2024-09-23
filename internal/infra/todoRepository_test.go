@@ -69,8 +69,8 @@ func TestTodoRepository_FindAll(t *testing.T) {
 		0,
 		text,
 		domain.NewCompleted(false),
-		domain.NewLastUpdate(domain.NewModelTime(time.Now())),
-		domain.NewCreatedAt(domain.NewModelTime(time.Now())),
+		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
+		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
 	)
 	err = repository.Create(todo)
 	if err != nil {
@@ -101,8 +101,8 @@ func Test_Todoが2件取得できる(t *testing.T) {
 		0,
 		text1,
 		domain.NewCompleted(false),
-		domain.NewLastUpdate(domain.NewModelTime(time.Now())),
-		domain.NewCreatedAt(domain.NewModelTime(time.Now())),
+		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
+		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
 	)
 	err = repository.Create(todo1)
 	if err != nil {
@@ -117,8 +117,8 @@ func Test_Todoが2件取得できる(t *testing.T) {
 		0,
 		text2,
 		domain.NewCompleted(false),
-		domain.NewLastUpdate(domain.NewModelTime(time.Now())),
-		domain.NewCreatedAt(domain.NewModelTime(time.Now())),
+		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
+		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
 	)
 	err = repository.Create(todo2)
 	if err != nil {
