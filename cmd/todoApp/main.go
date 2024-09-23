@@ -49,7 +49,7 @@ func main() {
 	})
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 	apiV1 := e.Group("/api/v1")
-	apiV1.GET("/hello", c.GetHello())
+	apiV1.GET("/", c.GetHello())
 	apiV1.GET("/todos", c.FindAllTodo())
 	apiV1.POST("/todos", c.CreateTodo())
 	apiV1.GET("/todos/:id", c.FindTodoByID())
