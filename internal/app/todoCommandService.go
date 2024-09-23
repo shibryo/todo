@@ -33,8 +33,16 @@ func (t *TodoComandServiceImpl)CreateTodoCommand(todo *domain.Todo) error {
 }
 
 
-func (t *TodoComandServiceImpl)UpdateTodoCommand(todo *domain.Todo) error {
-	err := t.repository.Update(todo)
+func (t *TodoComandServiceImpl)UpdateTodoCommand(newTodo *domain.Todo) error {
+	oldTodo, err := t.repository.FindByID(newTodo.ID.AsGoUint64())
+	if err != nil {
+		return fmt.Errorf("failed to find todo: %w", err)
+	}
+
+	oldTodo.UpdateTitle(&newTodo.Title)
+	oldTodo.UpdateCompleted(&newTodo.Completed)
+
+	err = t.repository.Update(oldTodo)
 	if err != nil {
 		return fmt.Errorf("failed to update todo: %w", err)
 	}

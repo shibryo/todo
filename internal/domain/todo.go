@@ -10,6 +10,9 @@ type ID uint64
 func NewID(id uint64) ID {
 	return ID(id)
 }
+func (i ID) AsGoUint64() uint64 {
+	return uint64(i)
+}
 
 type Title struct {
 	text string
