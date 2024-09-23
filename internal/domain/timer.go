@@ -1,6 +1,6 @@
 package domain
 
-//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=model_mock
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=domain_mock
 
 import "time"
 

@@ -1,5 +1,7 @@
 package app
 
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=app_mock
+
 import (
 	"fmt"
 	"todo/internal/domain"
@@ -53,7 +55,8 @@ func (t *TodoComandServiceImpl)UpdateTodoCommand(newTodo *domain.Todo) error {
 
 // DeleteTodoCommandはTodoを削除します。
 func (t *TodoComandServiceImpl)DeleteTodoCommand(todo *domain.Todo) error {
-	err := t.repository.Delete(todo)
+	deletableTodo := domain.NewDeletableTodo(todo.ID)
+	err := t.repository.Delete(deletableTodo)
 	if err != nil {
 		return fmt.Errorf("failed to delete todo: %w", err)
 	}

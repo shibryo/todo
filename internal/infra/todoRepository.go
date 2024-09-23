@@ -25,7 +25,7 @@ type TodoRepositorier interface {
 	FindByID(id uint64) (*domain.Todo, error)
 	Create(todoModel *domain.Todo) error
 	Update(todoModel *domain.Todo) error
-	Delete(todoModel *domain.Todo) error
+	Delete(todoModel *domain.DeletableTodo) error
 }
 
 // TodoRepositoryはTodoのリポジトリ構造体です。
@@ -121,9 +121,15 @@ func (t *TodoRepository) Update(todoModel *domain.Todo) error {
 	return nil
 }
 
+func convertDeletableTodoToTodo(todoModel *domain.DeletableTodo) *Todo {
+	return &Todo{
+		ID: uint64(todoModel.ID),
+	}
+}
+
 // DeleteはTodoを削除します。
-func (t *TodoRepository) Delete(todoModel *domain.Todo) error {
-	todo := convertToTodo(todoModel)
+func (t *TodoRepository) Delete(todoModel *domain.DeletableTodo) error {
+	todo := convertDeletableTodoToTodo(todoModel)
 	_, err := t.db.NewDelete().Model(todo).WherePK().Exec(context.TODO())
 	if err != nil {
 		return err

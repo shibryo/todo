@@ -107,6 +107,14 @@ func NewTodo(id ID, title *Title, completed *Completed, lastUpdate *LastUpdate, 
 	}
 }
 
+type DeletableTodo struct {
+	ID ID `bun:"id"`
+}
+
+func NewDeletableTodo(id ID) *DeletableTodo {
+	return &DeletableTodo{ID: id}
+}
+
 func (t *Todo) UpdateTitle(title *Title) {
 	t.Title = *title
 	t.UpdateLastUpdate(NewDomainTimeNow())
