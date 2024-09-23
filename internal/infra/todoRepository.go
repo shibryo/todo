@@ -55,8 +55,8 @@ func convertToTodoModels(todos []*Todo) ([]*domain.Todo, error) {
 		}
 
 		completed := domain.NewCompleted(todo.Completed)
-		lastUpdate := domain.NewLastUpdate(domain.NewLastUpdate(domain.NewDomainTime(todo.LastUpdate)))
-		createdAt := domain.NewCreatedAt(domain.NewCreatedAt(domain.NewDomainTime(todo.CreatedAt)))
+		lastUpdate := domain.NewLastUpdate(domain.NewLastUpdate(domain.NewTime(todo.LastUpdate)))
+		createdAt := domain.NewCreatedAt(domain.NewCreatedAt(domain.NewTime(todo.CreatedAt)))
 		todoModel := domain.NewTodo(id, *title, completed, lastUpdate, createdAt)
 		todoModels = append(todoModels, todoModel)
 	}
@@ -90,8 +90,8 @@ func convertToTodoModel(todo *Todo) (*domain.Todo, error) {
 	}
 
 	completed := domain.NewCompleted(todo.Completed)
-	lastUpdate := domain.NewLastUpdate(domain.NewLastUpdate(domain.NewDomainTime(todo.LastUpdate)))
-	createdAt := domain.NewCreatedAt(domain.NewCreatedAt(domain.NewDomainTime(todo.CreatedAt)))
+	lastUpdate := domain.NewLastUpdate(domain.NewLastUpdate(domain.NewTime(todo.LastUpdate)))
+	createdAt := domain.NewCreatedAt(domain.NewCreatedAt(domain.NewTime(todo.CreatedAt)))
 	todoModel := domain.NewTodo(id, *title, completed, lastUpdate, createdAt)
 
 	return todoModel, nil

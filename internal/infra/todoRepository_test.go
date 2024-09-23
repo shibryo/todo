@@ -6,14 +6,15 @@ import (
 	"testing"
 	"time"
 
+	di "todo/internal/di"
+	domain "todo/internal/domain"
+	infra "todo/internal/infra"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
-	di "todo/internal/di"
-	domain "todo/internal/domain"
-	infra "todo/internal/infra"
 )
 
 func SetupDB(t *testing.T) string {
@@ -76,20 +77,41 @@ func TestTodoRepository_FindAll(t *testing.T) {
 		0,
 		*text,
 		domain.NewCompleted(false),
-		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
-		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
+		domain.NewLastUpdate(domain.NewTime(time.Now())),
+		domain.NewCreatedAt(domain.NewTime(time.Now())),
 	)
 	err = repository.Create(todo)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	got, err := repository.FindAll()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	gotCount := len(got)
 	assert.Equal(t, 1, gotCount)
+}
+
+func TestTodoRepository_FindByID(t *testing.T) {
+	t.Parallel()
+	repository, err := NewTestTodoRepository(t)
+	require.NoError(t, err)
+
+	text, err := domain.NewTitle("test")
+	require.NoError(t, err)
+
+	todo := domain.NewTodo(
+		1,
+		*text,
+		domain.NewCompleted(false),
+		domain.NewLastUpdate(domain.NewTime(time.Now())),
+		domain.NewCreatedAt(domain.NewTime(time.Now())),
+	)
+
+	err = repository.Create(todo)
+	require.NoError(t, err)
+
+	got, err := repository.FindByID(1)
+	require.NoError(t, err)
+
+	assert.Equal(t, "test", got.Title.AsGoString())
 }
 
 func Test_Todoが2件取得できる(t *testing.T) {
@@ -106,8 +128,8 @@ func Test_Todoが2件取得できる(t *testing.T) {
 		0,
 		*text1,
 		domain.NewCompleted(false),
-		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
-		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
+		domain.NewLastUpdate(domain.NewTime(time.Now())),
+		domain.NewCreatedAt(domain.NewTime(time.Now())),
 	)
 
 	err = repository.Create(todo1)
@@ -124,8 +146,8 @@ func Test_Todoが2件取得できる(t *testing.T) {
 		0,
 		*text2,
 		domain.NewCompleted(false),
-		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
-		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
+		domain.NewLastUpdate(domain.NewTime(time.Now())),
+		domain.NewCreatedAt(domain.NewTime(time.Now())),
 	)
 
 	err = repository.Create(todo2)
@@ -137,4 +159,75 @@ func Test_Todoが2件取得できる(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Len(t, got, 2)
+}
+
+func Test_Todoが1件更新できる(t *testing.T) {
+	t.Parallel()
+
+	repository, err := NewTestTodoRepository(t)
+	require.NoError(t, err)
+
+	text, err := domain.NewTitle("test")
+	require.NoError(t, err)
+
+	oldTodo := domain.NewTodo(
+		1,
+		*text,
+		domain.NewCompleted(false),
+		domain.NewLastUpdate(domain.NewTime(time.Now())),
+		domain.NewCreatedAt(domain.NewTime(time.Now())),
+	)
+
+	err = repository.Create(oldTodo)
+	require.NoError(t, err)
+
+	newText, err := domain.NewTitle("update")
+	require.NoError(t, err)
+
+	newTodo := domain.NewTodo(
+		oldTodo.ID,
+		*newText,
+		domain.NewCompleted(true),
+		domain.NewLastUpdate(domain.NewTime(time.Now())),
+		domain.NewCreatedAt(domain.NewTime(time.Now())),
+	)
+
+	err = repository.Update(newTodo)
+	require.NoError(t, err)
+
+	got, err := repository.FindAll()
+	require.NoError(t, err)
+
+	assert.Equal(t, "update", got[0].Title.AsGoString())
+}
+
+func Test_Todoが1件削除できる(t *testing.T) {
+	t.Parallel()
+
+	repository, err := NewTestTodoRepository(t)
+	require.NoError(t, err)
+
+	text, err := domain.NewTitle("test")
+	require.NoError(t, err)
+
+	todo := domain.NewTodo(
+		1,
+		*text,
+		domain.NewCompleted(false),
+		domain.NewLastUpdate(domain.NewTime(time.Now())),
+		domain.NewCreatedAt(domain.NewTime(time.Now())),
+	)
+
+	err = repository.Create(todo)
+	require.NoError(t, err)
+
+	deletableTodo := domain.NewDeletableTodo(todo.ID)
+
+	err = repository.Delete(deletableTodo)
+	require.NoError(t, err)
+
+	got, err := repository.FindAll()
+	require.NoError(t, err)
+
+	assert.Len(t, got, 0)
 }

@@ -13,7 +13,7 @@ type Time struct {
 	date time.Time
 }
 
-func NewDomainTime(date time.Time) *Time {
+func NewTime(date time.Time) *Time {
 	return &Time{date: date}
 }
 
@@ -25,6 +25,6 @@ func (t Time) AsGoTime() time.Time {
 	return t.date
 }
 
-func NewDomainTimeNow() *Time {
-	return NewDomainTime(time.Now())
+func TimerNow() *Time {
+	return NewTime(time.Now())
 }

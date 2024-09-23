@@ -77,8 +77,8 @@ func TestUpdateTodoCommand_Todoを作成してからTodo更新が成功する(t 
 	id := uint64(1)
 	oldTodo := domain.NewTodo(domain.NewID(id), *title,
 		domain.NewCompleted(false),
-		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
-		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
+		domain.NewLastUpdate(domain.NewTime(time.Now())),
+		domain.NewCreatedAt(domain.NewTime(time.Now())),
 	)
 
 	err = repository.Create(oldTodo)
@@ -108,8 +108,8 @@ func TestDeleteTodoCommand_Todoを作成してからTodo削除が成功する(t 
 	id := uint64(1)
 	todo := domain.NewTodo(domain.NewID(id), *title,
 		domain.NewCompleted(false),
-		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
-		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
+		domain.NewLastUpdate(domain.NewTime(time.Now())),
+		domain.NewCreatedAt(domain.NewTime(time.Now())),
 	)
 
 	err = repository.Create(todo)
@@ -140,8 +140,8 @@ func TestFindAllCommand_Todoが2件取得できる(t *testing.T) {
 
 	todo1 := domain.NewTodo(domain.NewID(1), *title1,
 		domain.NewCompleted(false),
-		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
-		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
+		domain.NewLastUpdate(domain.NewTime(time.Now())),
+		domain.NewCreatedAt(domain.NewTime(time.Now())),
 	)
 
 	err = repository.Create(todo1)
@@ -152,8 +152,8 @@ func TestFindAllCommand_Todoが2件取得できる(t *testing.T) {
 
 	todo2 := domain.NewTodo(domain.NewID(2), *title2,
 		domain.NewCompleted(false),
-		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
-		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
+		domain.NewLastUpdate(domain.NewTime(time.Now())),
+		domain.NewCreatedAt(domain.NewTime(time.Now())),
 	)
 	err = repository.Create(todo2)
 	require.NoError(t, err)
@@ -180,8 +180,8 @@ func TestFindByIdCommand_IDを指定してTodoが取得できる(t *testing.T) {
 	id := uint64(1)
 	todo := domain.NewTodo(domain.NewID(id), *title,
 		domain.NewCompleted(false),
-		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
-		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
+		domain.NewLastUpdate(domain.NewTime(time.Now())),
+		domain.NewCreatedAt(domain.NewTime(time.Now())),
 	)
 
 	err = repository.Create(todo)

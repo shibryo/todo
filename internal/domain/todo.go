@@ -1,5 +1,7 @@
 package domain
 
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=app_mock
+
 import (
 	"errors"
 	"time"
@@ -52,18 +54,6 @@ func NewCompleted(value bool) Completed {
 
 func (c Completed) AsGoBool() bool {
 	return c.value
-}
-
-func (c Completed) Toggle() Completed {
-	return NewCompleted(!c.value)
-}
-
-func (c Completed) ToCompleted() Completed {
-	return NewCompleted(true)
-}
-
-func (c Completed) ToIncompleted() Completed {
-	return NewCompleted(false)
 }
 
 type LastUpdate struct {
@@ -129,8 +119,8 @@ func Create(id ID, title Title, completed Completed) *Todo {
 		ID:         id,
 		Title:      title,
 		Completed:  completed,
-		LastUpdate: NewLastUpdate(NewDomainTimeNow()),
-		CreatedAt:  NewCreatedAt(NewDomainTimeNow()),
+		LastUpdate: NewLastUpdate(TimerNow()),
+		CreatedAt:  NewCreatedAt(TimerNow()),
 	}
 }
 
@@ -140,27 +130,12 @@ func (t *Todo) Delete() *DeletableTodo {
 
 func (t *Todo) UpdateTitle(title *Title) {
 	t.Title = *title
-	t.UpdateLastUpdate(NewDomainTimeNow())
-}
-
-func (t *Todo) ToggleCompleted() {
-	t.Completed = t.Completed.Toggle()
-	t.UpdateLastUpdate(NewDomainTimeNow())
-}
-
-func (t *Todo) ToCompleted() {
-	t.Completed = t.Completed.ToCompleted()
-	t.UpdateLastUpdate(NewDomainTimeNow())
-}
-
-func (t *Todo) ToIncompleted() {
-	t.Completed = t.Completed.ToIncompleted()
-	t.UpdateLastUpdate(NewDomainTimeNow())
+	t.UpdateLastUpdate(TimerNow())
 }
 
 func (t *Todo) UpdateCompleted(completed Completed) {
 	t.Completed = completed
-	t.UpdateLastUpdate(NewDomainTimeNow())
+	t.UpdateLastUpdate(TimerNow())
 }
 
 func (t *Todo) UpdateLastUpdate(now Timer) {

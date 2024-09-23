@@ -16,31 +16,31 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockDomainTimer is a mock of DomainTimer interface.
-type MockDomainTimer struct {
+// MockTimer is a mock of Timer interface.
+type MockTimer struct {
 	ctrl     *gomock.Controller
-	recorder *MockDomainTimerMockRecorder
+	recorder *MockTimerMockRecorder
 }
 
-// MockDomainTimerMockRecorder is the mock recorder for MockDomainTimer.
-type MockDomainTimerMockRecorder struct {
-	mock *MockDomainTimer
+// MockTimerMockRecorder is the mock recorder for MockTimer.
+type MockTimerMockRecorder struct {
+	mock *MockTimer
 }
 
-// NewMockDomainTimer creates a new mock instance.
-func NewMockDomainTimer(ctrl *gomock.Controller) *MockDomainTimer {
-	mock := &MockDomainTimer{ctrl: ctrl}
-	mock.recorder = &MockDomainTimerMockRecorder{mock}
+// NewMockTimer creates a new mock instance.
+func NewMockTimer(ctrl *gomock.Controller) *MockTimer {
+	mock := &MockTimer{ctrl: ctrl}
+	mock.recorder = &MockTimerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockDomainTimer) EXPECT() *MockDomainTimerMockRecorder {
+func (m *MockTimer) EXPECT() *MockTimerMockRecorder {
 	return m.recorder
 }
 
 // AsGoString mocks base method.
-func (m *MockDomainTimer) AsGoString() string {
+func (m *MockTimer) AsGoString() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AsGoString")
 	ret0, _ := ret[0].(string)
@@ -48,13 +48,13 @@ func (m *MockDomainTimer) AsGoString() string {
 }
 
 // AsGoString indicates an expected call of AsGoString.
-func (mr *MockDomainTimerMockRecorder) AsGoString() *gomock.Call {
+func (mr *MockTimerMockRecorder) AsGoString() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AsGoString", reflect.TypeOf((*MockDomainTimer)(nil).AsGoString))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AsGoString", reflect.TypeOf((*MockTimer)(nil).AsGoString))
 }
 
 // AsGoTime mocks base method.
-func (m *MockDomainTimer) AsGoTime() time.Time {
+func (m *MockTimer) AsGoTime() time.Time {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AsGoTime")
 	ret0, _ := ret[0].(time.Time)
@@ -62,7 +62,7 @@ func (m *MockDomainTimer) AsGoTime() time.Time {
 }
 
 // AsGoTime indicates an expected call of AsGoTime.
-func (mr *MockDomainTimerMockRecorder) AsGoTime() *gomock.Call {
+func (mr *MockTimerMockRecorder) AsGoTime() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AsGoTime", reflect.TypeOf((*MockDomainTimer)(nil).AsGoTime))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AsGoTime", reflect.TypeOf((*MockTimer)(nil).AsGoTime))
 }

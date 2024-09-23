@@ -7,15 +7,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"go.uber.org/mock/gomock"
 	app "todo/internal/app"
 	app_mock "todo/internal/app/mock"
 	domain "todo/internal/domain"
 	infra_mock "todo/internal/infra/mock"
 	view "todo/internal/view"
+
+	"github.com/labstack/echo/v4"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 func TestGetHello_成功する(t *testing.T) {
@@ -78,8 +79,8 @@ func TestFindTodoByID_成功する_1件(t *testing.T) {
 	require.NoError(t, err)
 	resultTodo := domain.NewTodo(domain.NewID(id),
 		*title, domain.NewCompleted(false),
-		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
-		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
+		domain.NewLastUpdate(domain.NewTime(time.Now())),
+		domain.NewCreatedAt(domain.NewTime(time.Now())),
 	)
 
 	reqTodo := app.NewTodoIDData(id)

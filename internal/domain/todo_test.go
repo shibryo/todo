@@ -4,9 +4,10 @@ import (
 	"testing"
 	"time"
 
+	domain "todo/internal/domain"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	domain "todo/internal/domain"
 )
 
 func Test_Titleが一文字の時に作成できる(t *testing.T) {
@@ -33,19 +34,11 @@ func Test_Titleが101文字の時に作成できない(t *testing.T) {
 func Test_Titleが空文字の時に作成できない(t *testing.T) {
 	t.Parallel()
 	_, err := domain.NewTitle("")
-	assert.Equal(t, "title is empty", err.Error())
-}
-
-func Test_CompleteをToggleすると値が反転する(t *testing.T) {
-	t.Parallel()
-	completedFalse := domain.NewCompleted(false)
-
-	completedTrue := completedFalse.Toggle()
-	assert.True(t, completedTrue.AsGoBool())
+	assert.Equal(t, "title is too short", err.Error())
 }
 
 func setupTodo() (*domain.Todo, *domain.Time) {
-	now := domain.NewDomainTime(time.Date(2024, 9, 4, 12, 0, 0, 0, time.Local))
+	now := domain.NewTime(time.Date(2024, 9, 4, 12, 0, 0, 0, time.Local))
 	text := "title"
 	id := domain.NewID(1)
 	title, _ := domain.NewTitle(text)
@@ -79,31 +72,52 @@ func Test_TodoのTitleを更新できる(t *testing.T) {
 	require.NoError(t, err)
 
 	todo.UpdateTitle(newTitle)
-
 	assert.Equal(t, "new_title", todo.Title.AsGoString())
 }
 
-func Test_TodoのCompleteをToggleできる(t *testing.T) {
+func Test_TodoのCompletedを更新できる(t *testing.T) {
 	t.Parallel()
 	todo, _ := setupTodo()
 
-	todo.ToggleCompleted()
+	todo.UpdateCompleted(domain.NewCompleted(true))
 
-	if todo.Completed.AsGoBool() != true {
-		t.Fatal("completed is invalid")
-	}
-
-	t.Log("completed is valid")
+	assert.True(t, todo.Completed.AsGoBool())
 }
 
 func Test_TodoのLastUpdateを更新できる(t *testing.T) {
 	t.Parallel()
 	todo, _ := setupTodo()
-	now := domain.NewDomainTime(time.Date(2024, 9, 4, 12, 0, 0, 0, time.Local))
+	now := domain.NewTime(time.Date(2024, 9, 4, 12, 0, 0, 0, time.Local))
 
 	todo.UpdateLastUpdate(now)
 
 	if todo.LastUpdate.AsGoString() != "2024-09-04 12:00:00" {
 		t.Fatal("lastUpdate is invalid", todo.LastUpdate.AsGoString())
 	}
+}
+
+func Test_TodoのDeleteでDeletableTodoが作成される(t *testing.T) {
+	t.Parallel()
+	todo, _ := setupTodo()
+
+	deletableTodo := todo.Delete()
+
+	if deletableTodo.ID.AsGoUint64() != 1 {
+		t.Fatal("deletableTodo is invalid", deletableTodo.ID.AsGoUint64())
+	}
+}
+
+func Test_TodoのCreateでTodoが作成される(t *testing.T) {
+	t.Parallel()
+	id := domain.NewID(1)
+	title, _ := domain.NewTitle("title")
+	completed := domain.NewCompleted(false)
+
+	todo := domain.Create(id, *title, completed)
+
+	assert.Equal(t, domain.NewID(1), todo.ID)
+	assert.Equal(t, "title", todo.Title.AsGoString())
+	assert.False(t, todo.Completed.AsGoBool())
+	assert.NotEqual(t, "", todo.LastUpdate.AsGoString())
+	assert.NotEqual(t, "", todo.CreatedAt.AsGoString())
 }
