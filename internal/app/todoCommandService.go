@@ -1,16 +1,16 @@
 package app
 
 import (
-	"net/http"
+	"fmt"
 	"todo/internal/domain"
 	repository "todo/internal/infra"
-
-	"github.com/labstack/echo/v4"
 )
 
 // TodoComandServiceはTodoのコマンドサービスインターフェースです。
 type TodoComandService interface {
-	CreateTodoCommand(todo *domain.Todo, c echo.Context) (bool, error)
+	CreateTodoCommand(todo *domain.Todo) error
+	UpdateTodoCommand(todo *domain.Todo) error
+	DeleteTodoCommand(todo *domain.Todo) error
 }
 
 // TodoComandServiceはTodoのコマンドサービス構造体です。
@@ -24,11 +24,27 @@ func NewTodoCommandServiceImpl(repository repository.TodoRepositorier) TodoComan
 }
 
 
-func (t *TodoComandServiceImpl)CreateTodoCommand(todo *domain.Todo, c echo.Context) (bool, error) {
+func (t *TodoComandServiceImpl)CreateTodoCommand(todo *domain.Todo) error {
 	err := t.repository.Create(todo)
 	if err != nil {
-		return true, c.JSON(http.StatusInternalServerError, err)
+		return fmt.Errorf("failed to create todo: %w", err)
 	}
-	return false, nil
+	return nil
 }
 
+
+func (t *TodoComandServiceImpl)UpdateTodoCommand(todo *domain.Todo) error {
+	err := t.repository.Update(todo)
+	if err != nil {
+		return fmt.Errorf("failed to update todo: %w", err)
+	}
+	return nil
+}
+
+func (t *TodoComandServiceImpl)DeleteTodoCommand(todo *domain.Todo) error {
+	err := t.repository.Delete(todo)
+	if err != nil {
+		return fmt.Errorf("failed to delete todo: %w", err)
+	}
+	return nil
+}
