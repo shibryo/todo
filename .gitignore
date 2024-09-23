@@ -26,3 +26,6 @@ go.work.sum
 
 # vendor
 vendor/
+
+# docs
+docs/
