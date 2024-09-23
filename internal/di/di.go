@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"log/slog"
 	"os"
+	"todo/internal/app"
 	infra "todo/internal/infra"
 	view "todo/internal/view"
 
@@ -18,7 +19,7 @@ type config struct {
 	DSN string `env:"DSN"`
 }
 
-func getEnv()  (config, error) {
+func getEnv() (config, error) {
 	err := godotenv.Load()
 	if err != nil {
 		return config{}, err
@@ -28,6 +29,22 @@ func getEnv()  (config, error) {
 	}
 	slog.Info("getEnv", "c", c)
 	return c, nil
+}
+
+// NewDITodoRepositoryはTodoRepositoryを生成します。
+func getTodoRepository(dsn string) (infra.TodoRepositorier, error) {
+	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
+	db := bun.NewDB(sqldb, pgdialect.New())
+	// create todos table
+	_, err := db.NewCreateTable().
+		Model((*infra.Todo)(nil)).
+		IfNotExists().
+		Exec(context.TODO())
+	if err != nil {	
+		return nil, err
+	}
+	todoRepository := infra.NewTodoRepository(db)
+	return todoRepository, nil
 }
 
 // TodoRepositoryに依存性を注入します。
@@ -57,6 +74,25 @@ func NewDITodoController() (*view.TodoController, error) {
 	if err != nil {
 		return nil, err
 	}
-	c := view.NewTodoController(todoRepository)
+	todoCommandService, err := NewDITodoCommandService()
+	if err != nil {
+		return nil, err
+	}
+	c := view.NewTodoController(todoCommandService, todoRepository)
+	return c, nil
+}
+
+// NewDITodoCommandServiceはTodoCommandServiceを生成します。
+func NewDITodoCommandService() (app.TodoComandService, error) {
+	cnf, err := getEnv()
+	if err != nil {
+		return nil, err
+	}
+	dsn := cnf.DSN
+	todoRepository, err := NewDITodoRepository(dsn)
+	if err != nil {
+		return nil, err
+	}
+	c := app.NewTodoCommandServiceImpl(todoRepository)
 	return c, nil
 }

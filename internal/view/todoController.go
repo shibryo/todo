@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 	app "todo/internal/app"
-	model "todo/internal/domain"
-	repository "todo/internal/infra"
+	"todo/internal/domain"
+	"todo/internal/infra"
 
 	"github.com/labstack/echo/v4"
 )
@@ -20,12 +20,21 @@ type TodoView struct {
 	CreatedAt  string `json:"created_at"`
 }
 
-type TodoController struct {
-	todoRepository repository.TodoRepositorier
+type TodoCreateView struct { 
+	Title string `json:"title"`
+	Completed bool `json:"completed"`
 }
 
-func NewTodoController(todoRepository repository.TodoRepositorier) *TodoController {
-	return &TodoController{ todoRepository: todoRepository }
+type TodoController struct {
+	todoCoomandService app.TodoComandService
+	todoRepository infra.TodoRepositorier
+}
+
+func NewTodoController(todoComandService app.TodoComandService, todoRepository infra.TodoRepositorier) *TodoController {
+	return &TodoController{
+		todoCoomandService: todoComandService,
+		todoRepository: todoRepository,
+	}
 }
 
 // GetHello godoc
@@ -105,43 +114,36 @@ func(ctrl *TodoController) FindTodoByID() echo.HandlerFunc {
 // @ID create-todo
 // @Accept  json
 // @Produce  json
-// @Param todo body TodoView true "Todo"
-// @Success 200 {object} TodoView
+// @Param todo body TodoCreateView true "Todo"
+// @Success 200 {object} string
 // @Router /todos [post]
 func(ctrl *TodoController) CreateTodo() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		todoView := new(TodoView)
-		if err := c.Bind(todoView); err != nil {
+		todoCreateView := new(TodoCreateView)
+		if err := c.Bind(todoCreateView); err != nil {
 			slog.Info("bind error", "err",err)
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
-		title, err := model.NewTitle(todoView.Title)
+		title, err := domain.NewTitle(todoCreateView.Title)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, err)
 		}
-
-		todo := model.NewTodo(
+		todo := domain.NewTodo(
 			0,
 			title,
-			model.NewCompleted(todoView.Completed),
-			model.NewLastUpdate(model.NewModelTime(time.Now())),
-			model.NewCreatedAt(model.NewModelTime(time.Now())),
+			domain.NewCompleted(todoCreateView.Completed),
+			domain.NewLastUpdate(domain.NewModelTime(time.Now())),
+			domain.NewCreatedAt(domain.NewModelTime(time.Now())),
 		)
-		service := app.NewTodoCommandService(ctrl.todoRepository)
-		shouldReturn, returnValue := service.CreateTodoCommand(todo ,c)
-		if shouldReturn {
-			return returnValue
+		result, err := ctrl.todoCoomandService.CreateTodoCommand(todo, c)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err)
 		}
-
-		resultTodoView := TodoView{
-			ID:         uint64(todo.ID),
-			Title:      todo.Title.AsGoString(),
-			Completed:  todo.Completed.AsGoBool(),
-			LastUpdate: todo.LastUpdate.AsGoString(),
-			CreatedAt:  todo.CreatedAt.AsGoString(),
+		if result {
+			return c.JSON(http.StatusInternalServerError, err)
 		}
-		return c.JSON(http.StatusOK, resultTodoView)
+		return c.JSON(http.StatusOK, "success")
 	}
 }
 
@@ -169,17 +171,17 @@ func(ctrl *TodoController) UpdateTodo() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
-		title, err := model.NewTitle(todoView.Title)
+		title, err := domain.NewTitle(todoView.Title)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
-		todo := model.NewTodo(
-			model.NewID(id),
+		todo := domain.NewTodo(
+			domain.NewID(id),
 			title,
-			model.NewCompleted(todoView.Completed),
-			model.NewLastUpdate(model.NewModelTime(time.Now())),
-			model.NewCreatedAt(model.NewModelTime(time.Now())),
+			domain.NewCompleted(todoView.Completed),
+			domain.NewLastUpdate(domain.NewModelTime(time.Now())),
+			domain.NewCreatedAt(domain.NewModelTime(time.Now())),
 		)
 
 		err = ctrl.todoRepository.Update(todo)
@@ -213,8 +215,8 @@ func(ctrl *TodoController) DeleteTodo() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
-		todo := model.NewTodo(
-			model.NewID(id),
+		todo := domain.NewTodo(
+			domain.NewID(id),
 			nil,
 			nil,
 			nil,
