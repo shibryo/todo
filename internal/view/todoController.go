@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 	app "todo/internal/app"
-	"todo/internal/domain"
 	"todo/internal/infra"
 
 	"github.com/labstack/echo/v4"
@@ -98,7 +97,8 @@ func(ctrl *TodoController) FindTodoByID() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
-		todo, err := ctrl.todoComandService.FindByIdCommand(id)
+		reqTodo := app.NewTodoIDData(id)
+		todo, err := ctrl.todoComandService.FindByIdCommand(reqTodo)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
@@ -131,22 +131,12 @@ func(ctrl *TodoController) CreateTodo() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
-		title, err := domain.NewTitle(todoRequestView.Title)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, err)
-		}
-		todo := domain.NewTodo(
-			0,
-			title,
-			domain.NewCompleted(todoRequestView.Completed),
-			nil,
-			nil,
-		)
-		err = ctrl.todoComandService.CreateTodoCommand(todo)
+		todo := app.NewToDoData(0, todoRequestView.Title, todoRequestView.Completed)
+		err := ctrl.todoComandService.CreateTodoCommand(todo)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
-		return c.JSON(http.StatusOK, "success")
+		return c.JSON(http.StatusCreated, "success")
 	}
 }
 
@@ -173,17 +163,7 @@ func(ctrl *TodoController) UpdateTodo() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
-		title, err := domain.NewTitle(todoRequestView.Title)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, err)
-		}
-		todo := domain.NewTodo(
-			domain.NewID(id),
-			title,
-			domain.NewCompleted(todoRequestView.Completed),
-			nil,
-			nil,
-		)
+		todo := app.NewToDoData(id, todoRequestView.Title, todoRequestView.Completed)
 		err = ctrl.todoComandService.UpdateTodoCommand(todo)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
@@ -208,13 +188,7 @@ func(ctrl *TodoController) DeleteTodo() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
-		todo := domain.NewTodo(
-			domain.NewID(id),
-			nil,
-			nil,
-			nil,
-			nil,
-		)
+		todo := app.NewTodoIDData(id)
 		err = ctrl.todoComandService.DeleteTodoCommand(todo)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)

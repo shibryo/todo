@@ -1,5 +1,7 @@
 package infra
 
+//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=app_mock
+
 import (
 	"context"
 	"fmt"
@@ -58,7 +60,7 @@ func convertToTodoModels(todos []*Todo) ([]*domain.Todo, error) {
 		completed := domain.NewCompleted(todo.Completed)
 		lastUpdate := domain.NewLastUpdate(domain.NewLastUpdate(domain.NewDomainTime(todo.LastUpdate)))
 		createdAt := domain.NewCreatedAt(domain.NewCreatedAt(domain.NewDomainTime(todo.CreatedAt)))
-		todoModel := domain.NewTodo(id, title, completed, lastUpdate, createdAt)
+		todoModel := domain.NewTodo(id, *title, completed, lastUpdate, createdAt)
 		todoModels = append(todoModels, todoModel)
 	}
 	return todoModels, nil
@@ -87,7 +89,7 @@ func convertToTodoModel(todo *Todo) (*domain.Todo, error) {
 	completed := domain.NewCompleted(todo.Completed)
 	lastUpdate := domain.NewLastUpdate(domain.NewLastUpdate(domain.NewDomainTime(todo.LastUpdate)))
 	createdAt := domain.NewCreatedAt(domain.NewCreatedAt(domain.NewDomainTime(todo.CreatedAt)))
-	todoModel := domain.NewTodo(id, title, completed, lastUpdate, createdAt)
+	todoModel := domain.NewTodo(id, *title, completed, lastUpdate, createdAt)
 	return todoModel, nil
 }
 

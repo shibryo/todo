@@ -54,7 +54,7 @@ func setupTodo() (*domain.Todo, domain.DomainTimer, ) {
     completed := domain.NewCompleted(false)
     lastUpdate := domain.NewLastUpdate(now)
     createdAt := domain.NewCreatedAt(now)
-    todo := domain.NewTodo(id, title, completed, lastUpdate, createdAt)
+    todo := domain.NewTodo(id, *title, completed, lastUpdate, createdAt)
     return todo, now
 }
 

@@ -37,8 +37,8 @@ type Completed struct {
 	value bool
 }
 
-func NewCompleted(value bool) *Completed {
-	return &Completed{value: value}
+func NewCompleted(value bool) Completed {
+	return Completed{value: value}
 }
 
 func (c Completed) AsGoBool() bool {
@@ -46,14 +46,14 @@ func (c Completed) AsGoBool() bool {
 }
 
 func (c Completed) Toggle() Completed {
-	return *NewCompleted(!c.value)
+	return NewCompleted(!c.value)
 }
 
-func (c Completed) ToCompleted() *Completed {
+func (c Completed) ToCompleted() Completed {
 	return NewCompleted(true)
 }
 
-func (c Completed) ToIncompleted() *Completed {
+func (c Completed) ToIncompleted() Completed {
 	return NewCompleted(false)
 }
 
@@ -61,8 +61,8 @@ type LastUpdate struct {
 	date DomainTimer
 }
 
-func NewLastUpdate(date DomainTimer) *LastUpdate {
-	return &LastUpdate{date: date}
+func NewLastUpdate(date DomainTimer) LastUpdate {
+	return LastUpdate{date: date}
 }
 
 func (l LastUpdate) AsGoString() string {
@@ -77,8 +77,8 @@ type CreatedAt struct {
 	date DomainTimer
 }
 
-func NewCreatedAt(date DomainTimer) *CreatedAt {
-	return &CreatedAt{date: date}
+func NewCreatedAt(date DomainTimer) CreatedAt {
+	return CreatedAt{date: date}
 }
 
 func (c CreatedAt) AsGoString() string {
@@ -97,13 +97,13 @@ type Todo struct {
 	CreatedAt  CreatedAt   `bun:"created_at"`
 }
 
-func NewTodo(id ID, title *Title, completed *Completed, lastUpdate *LastUpdate, createdAt *CreatedAt) *Todo {
+func NewTodo(id ID, title Title, completed Completed, lastUpdate LastUpdate, createdAt CreatedAt) *Todo {
 	return &Todo{
 		ID:         id,
-		Title:      *title,
-		Completed:  *completed,
-		LastUpdate: *lastUpdate,
-		CreatedAt:  *createdAt,
+		Title:      title,
+		Completed:  completed,
+		LastUpdate: lastUpdate,
+		CreatedAt:  createdAt,
 	}
 }
 
@@ -113,6 +113,16 @@ type DeletableTodo struct {
 
 func NewDeletableTodo(id ID) *DeletableTodo {
 	return &DeletableTodo{ID: id}
+}
+
+func Create(id ID, title Title, completed Completed) *Todo {
+	return &Todo{
+		ID:         id,
+		Title:      title,
+		Completed:  completed,
+		LastUpdate: NewLastUpdate(NewDomainTimeNow()),
+		CreatedAt:  NewCreatedAt(NewDomainTimeNow()),
+	}
 }
 
 func (t *Todo) UpdateTitle(title *Title) {
@@ -126,20 +136,20 @@ func (t *Todo) ToggleCompleted() {
 }
 
 func (t *Todo) ToCompleted() {
-	t.Completed = *t.Completed.ToCompleted()
+	t.Completed = t.Completed.ToCompleted()
 	t.UpdateLastUpdate(NewDomainTimeNow())
 }
 
 func (t *Todo) ToIncompleted() {
-	t.Completed = *t.Completed.ToIncompleted()
+	t.Completed = t.Completed.ToIncompleted()
 	t.UpdateLastUpdate(NewDomainTimeNow())
 }
 
-func (t *Todo) UpdateCompleted(completed *Completed) {
-	t.Completed = *completed
+func (t *Todo) UpdateCompleted(completed Completed) {
+	t.Completed = completed
 	t.UpdateLastUpdate(NewDomainTimeNow())
 }
 
 func (t *Todo) UpdateLastUpdate(now DomainTimer) {
-	t.LastUpdate = *NewLastUpdate(now)
+	t.LastUpdate = NewLastUpdate(now)
 }

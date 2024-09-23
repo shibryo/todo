@@ -31,22 +31,6 @@ func getEnv() (config, error) {
 	return c, nil
 }
 
-// NewDITodoRepositoryはTodoRepositoryを生成します。
-func getTodoRepository(dsn string) (infra.TodoRepositorier, error) {
-	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
-	db := bun.NewDB(sqldb, pgdialect.New())
-	// create todos table
-	_, err := db.NewCreateTable().
-		Model((*infra.Todo)(nil)).
-		IfNotExists().
-		Exec(context.TODO())
-	if err != nil {	
-		return nil, err
-	}
-	todoRepository := infra.NewTodoRepository(db)
-	return todoRepository, nil
-}
-
 // TodoRepositoryに依存性を注入します。
 func NewDITodoRepository(dsn string) (infra.TodoRepositorier, error) {
 	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
