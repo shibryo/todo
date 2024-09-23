@@ -83,19 +83,19 @@ func (mr *MockTodoComandServiceMockRecorder) FindAllCommand() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAllCommand", reflect.TypeOf((*MockTodoComandService)(nil).FindAllCommand))
 }
 
-// FindByIdCommand mocks base method.
-func (m *MockTodoComandService) FindByIdCommand(todo app.TodoIDData) (*domain.Todo, error) {
+// FindByIDCommand mocks base method.
+func (m *MockTodoComandService) FindByIDCommand(todo app.TodoIDData) (*domain.Todo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindByIdCommand", todo)
+	ret := m.ctrl.Call(m, "FindByIDCommand", todo)
 	ret0, _ := ret[0].(*domain.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FindByIdCommand indicates an expected call of FindByIdCommand.
-func (mr *MockTodoComandServiceMockRecorder) FindByIdCommand(todo any) *gomock.Call {
+// FindByIDCommand indicates an expected call of FindByIDCommand.
+func (mr *MockTodoComandServiceMockRecorder) FindByIDCommand(todo any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByIdCommand", reflect.TypeOf((*MockTodoComandService)(nil).FindByIdCommand), todo)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByIDCommand", reflect.TypeOf((*MockTodoComandService)(nil).FindByIDCommand), todo)
 }
 
 // UpdateTodoCommand mocks base method.

@@ -2,20 +2,22 @@ package infra_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
-	"todo/internal/app"
-	"todo/internal/di"
-	"todo/internal/domain"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
+	di "todo/internal/di"
+	domain "todo/internal/domain"
+	infra "todo/internal/infra"
 )
 
 func SetupDB(t *testing.T) string {
+	t.Helper()
 	// Setup
 	ctx := context.Background()
 
@@ -46,12 +48,15 @@ func SetupDB(t *testing.T) string {
 	return connStr
 }
 
-func NewTestTodoRepository(t *testing.T) (app.TodoRepositorier, error) {
+func NewTestTodoRepository(t *testing.T) (*infra.TodoRepository, error) {
+	t.Helper()
 	dsn := SetupDB(t)
+
 	repository, err := di.NewDITodoRepository(dsn)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get todo repository: %w", err)
 	}
+
 	return repository, nil
 }
 
@@ -89,16 +94,14 @@ func TestTodoRepository_FindAll(t *testing.T) {
 
 func Test_Todoが2件取得できる(t *testing.T) {
 	t.Parallel()
+
 	repository, err := NewTestTodoRepository(t)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	// set 2data
 	text1, err := domain.NewTitle("test")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	todo1 := domain.NewTodo(
 		0,
 		*text1,
@@ -106,6 +109,7 @@ func Test_Todoが2件取得できる(t *testing.T) {
 		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
 		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
 	)
+
 	err = repository.Create(todo1)
 	if err != nil {
 		t.Fatal(err)
@@ -115,6 +119,7 @@ func Test_Todoが2件取得できる(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	todo2 := domain.NewTodo(
 		0,
 		*text2,
@@ -122,15 +127,14 @@ func Test_Todoが2件取得できる(t *testing.T) {
 		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
 		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
 	)
+
 	err = repository.Create(todo2)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	got, err := repository.FindAll()
-	if err != nil {
-		t.Fatal(err)
-	}
-	gotCount := len(got)
-	assert.Equal(t, 2, gotCount)
+	require.NoError(t, err)
+
+	assert.Len(t, got, 2)
 }

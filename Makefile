@@ -21,7 +21,7 @@ lint:
 
 # fix
 fix:
-	golangci-lint run --fix
+	golangci-lint run --fix --config .golangci.yaml
 
 # coverage html
 coverage:

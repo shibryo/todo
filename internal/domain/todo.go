@@ -1,8 +1,13 @@
 package domain
 
 import (
-	"fmt"
+	"errors"
 	"time"
+)
+
+var (
+	ErrTitleTooShort = errors.New("title is too short")
+	ErrTitleTooLong  = errors.New("title is too long")
 )
 
 type ID uint64
@@ -20,11 +25,14 @@ type Title struct {
 }
 
 func NewTitle(text string) (*Title, error) {
-	if len(text) == 0 {
-		return nil, fmt.Errorf("title is empty")
+	minTextLength := 1
+	if len(text) < minTextLength {
+		return nil, ErrTitleTooShort
 	}
-	if len(text) > 100 {
-		return nil, fmt.Errorf("title is too long")
+
+	maxTextLength := 100
+	if len(text) > maxTextLength {
+		return nil, ErrTitleTooLong
 	}
 
 	return &Title{text: text}, nil
@@ -59,10 +67,10 @@ func (c Completed) ToIncompleted() Completed {
 }
 
 type LastUpdate struct {
-	date DomainTimer
+	date Timer
 }
 
-func NewLastUpdate(date DomainTimer) LastUpdate {
+func NewLastUpdate(date Timer) LastUpdate {
 	return LastUpdate{date: date}
 }
 
@@ -75,10 +83,10 @@ func (l LastUpdate) AsGoTime() time.Time {
 }
 
 type CreatedAt struct {
-	date DomainTimer
+	date Timer
 }
 
-func NewCreatedAt(date DomainTimer) CreatedAt {
+func NewCreatedAt(date Timer) CreatedAt {
 	return CreatedAt{date: date}
 }
 
@@ -155,6 +163,6 @@ func (t *Todo) UpdateCompleted(completed Completed) {
 	t.UpdateLastUpdate(NewDomainTimeNow())
 }
 
-func (t *Todo) UpdateLastUpdate(now DomainTimer) {
+func (t *Todo) UpdateLastUpdate(now Timer) {
 	t.LastUpdate = NewLastUpdate(now)
 }

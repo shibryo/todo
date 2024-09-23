@@ -9,12 +9,13 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
-	"todo/internal/app"
+	app "todo/internal/app"
 	app_mock "todo/internal/app/mock"
-	"todo/internal/domain"
+	domain "todo/internal/domain"
 	infra_mock "todo/internal/infra/mock"
-	"todo/internal/view"
+	view "todo/internal/view"
 )
 
 func TestGetHello_成功する(t *testing.T) {
@@ -50,6 +51,7 @@ func TestFindAllTodo_成功する_0件(t *testing.T) {
 	controller := view.NewTodoController(mockService, repository)
 
 	mockService.EXPECT().FindAllCommand().Return([]*domain.Todo{}, nil)
+
 	if assert.NoError(t, controller.FindAllTodo()(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 		assert.Equal(t, "[]\n", rec.Body.String())
@@ -73,10 +75,16 @@ func TestFindTodoByID_成功する_1件(t *testing.T) {
 
 	id := uint64(1)
 	title, err := domain.NewTitle("test")
-	assert.Nil(t, err)
-	resultTodo := domain.NewTodo(domain.NewID(id), *title, domain.NewCompleted(false), domain.NewLastUpdate(domain.NewDomainTime(time.Now())), domain.NewCreatedAt(domain.NewDomainTime(time.Now())))
+	require.NoError(t, err)
+	resultTodo := domain.NewTodo(domain.NewID(id),
+		*title, domain.NewCompleted(false),
+		domain.NewLastUpdate(domain.NewDomainTime(time.Now())),
+		domain.NewCreatedAt(domain.NewDomainTime(time.Now())),
+	)
+
 	reqTodo := app.NewTodoIDData(id)
-	mockService.EXPECT().FindByIdCommand(reqTodo).Return(resultTodo, nil)
+	mockService.EXPECT().FindByIDCommand(reqTodo).Return(resultTodo, nil)
+
 	if assert.NoError(t, controller.FindTodoByID()(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	}
@@ -100,6 +108,7 @@ func TestCreateTodo_新規作成が成功する(t *testing.T) {
 
 	todo := app.NewToDoData(0, "New Todo", false)
 	mockService.EXPECT().CreateTodoCommand(todo).Return(nil)
+
 	if assert.NoError(t, controller.CreateTodo()(c)) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
 	}
@@ -124,6 +133,7 @@ func TestUpdateTodo_更新が成功する(t *testing.T) {
 
 	todo := app.NewToDoData(1, "Updated Todo", true)
 	mockService.EXPECT().UpdateTodoCommand(todo).Return(nil)
+
 	if assert.NoError(t, controller.UpdateTodo()(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 		assert.Contains(t, rec.Body.String(), "success")
@@ -147,6 +157,7 @@ func TestDeleteTodo_削除が成功する(t *testing.T) {
 
 	todo := app.NewTodoIDData(1)
 	mockService.EXPECT().DeleteTodoCommand(todo).Return(nil)
+
 	if assert.NoError(t, controller.DeleteTodo()(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	}

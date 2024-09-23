@@ -5,7 +5,7 @@ package app
 import (
 	"fmt"
 
-	"todo/internal/domain"
+	domain "todo/internal/domain"
 )
 
 type TodoIDData struct {
@@ -38,7 +38,7 @@ type TodoComandService interface {
 	UpdateTodoCommand(todo TodoData) error
 	DeleteTodoCommand(todo TodoIDData) error
 	FindAllCommand() ([]*domain.Todo, error)
-	FindByIdCommand(todo TodoIDData) (*domain.Todo, error)
+	FindByIDCommand(todo TodoIDData) (*domain.Todo, error)
 }
 
 // TodoComandServiceはTodoのコマンドサービス構造体です。
@@ -47,7 +47,7 @@ type TodoComandServiceImpl struct {
 }
 
 // NewTodoCommandServiceImplはTodoのコマンドサービスを生成します。
-func NewTodoCommandServiceImpl(repository TodoRepositorier) TodoComandService {
+func NewTodoCommandServiceImpl(repository TodoRepositorier) *TodoComandServiceImpl {
 	return &TodoComandServiceImpl{repository: repository}
 }
 
@@ -57,15 +57,16 @@ func (t *TodoComandServiceImpl) CreateTodoCommand(todoData TodoData) error {
 	if err != nil {
 		return fmt.Errorf("title is invalid: %w", err)
 	}
-	todo := domain.Create(
+
+	err = t.repository.Create(domain.Create(
 		domain.NewID(todoData.ID),
 		*title,
 		domain.NewCompleted(todoData.Completed),
-	)
-	err = t.repository.Create(todo)
+	))
 	if err != nil {
 		return fmt.Errorf("failed to create todo: %w", err)
 	}
+
 	return nil
 }
 
@@ -75,10 +76,12 @@ func (t *TodoComandServiceImpl) UpdateTodoCommand(newTodo TodoData) error {
 	if err != nil {
 		return fmt.Errorf("failed to find todo: %w", err)
 	}
+
 	newTitle, err := domain.NewTitle(newTodo.Title)
 	if err != nil {
 		return fmt.Errorf("title is invalid: %w", err)
 	}
+
 	oldTodo.UpdateTitle(newTitle)
 	oldTodo.UpdateCompleted(domain.NewCompleted(newTodo.Completed))
 
@@ -86,6 +89,7 @@ func (t *TodoComandServiceImpl) UpdateTodoCommand(newTodo TodoData) error {
 	if err != nil {
 		return fmt.Errorf("failed to update todo: %w", err)
 	}
+
 	return nil
 }
 
@@ -95,12 +99,14 @@ func (t *TodoComandServiceImpl) DeleteTodoCommand(id TodoIDData) error {
 	if err != nil {
 		return fmt.Errorf("failed to find todo: %w", err)
 	}
+
 	deletableTodo := domain.NewDeletableTodo(oldTodo.ID)
 
 	err = t.repository.Delete(deletableTodo)
 	if err != nil {
 		return fmt.Errorf("failed to delete todo: %w", err)
 	}
+
 	return nil
 }
 
@@ -110,14 +116,16 @@ func (t *TodoComandServiceImpl) FindAllCommand() ([]*domain.Todo, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to find all todos: %w", err)
 	}
+
 	return todos, nil
 }
 
-// FindByIdCommandはIDを指定してTodoを取得します。
-func (t *TodoComandServiceImpl) FindByIdCommand(reqTodo TodoIDData) (*domain.Todo, error) {
+// FindByIDCommandはIDを指定してTodoを取得します。
+func (t *TodoComandServiceImpl) FindByIDCommand(reqTodo TodoIDData) (*domain.Todo, error) {
 	todo, err := t.repository.FindByID(reqTodo.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find todo by id: %w", err)
 	}
+
 	return todo, nil
 }

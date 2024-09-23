@@ -4,27 +4,27 @@ package domain
 
 import "time"
 
-type DomainTimer interface {
+type Timer interface {
 	AsGoString() string
 	AsGoTime() time.Time
 }
 
-type DomainTime struct {
+type Time struct {
 	date time.Time
 }
 
-func NewDomainTime(date time.Time) DomainTimer {
-	return &DomainTime{date: date}
+func NewDomainTime(date time.Time) *Time {
+	return &Time{date: date}
 }
 
-func (t DomainTime) AsGoString() string {
+func (t Time) AsGoString() string {
 	return t.date.Format("2006-01-02 15:04:05")
 }
 
-func (t DomainTime) AsGoTime() time.Time {
+func (t Time) AsGoTime() time.Time {
 	return t.date
 }
 
-func NewDomainTimeNow() DomainTimer {
+func NewDomainTimeNow() *Time {
 	return NewDomainTime(time.Now())
 }

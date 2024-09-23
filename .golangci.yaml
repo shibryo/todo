@@ -1,7 +1,7 @@
 linters:
   enable:
     - asasalint
-    - asciicheck
+    # - asciicheck // too many false positives. 変数名に日本語（を、作、が）が含まれると怒られる
     - bidichk
     - bodyclose
     - canonicalheader
@@ -10,7 +10,7 @@ linters:
     - copyloopvar
     - cyclop
     - decorder
-    - depguard
+    # - depguard // too many false positives. パッケージが依存していると怒られる
     - dogsled
     - dupl
     - dupword
@@ -28,7 +28,7 @@ linters:
     - forbidigo
     - forcetypeassert
     - funlen
-    - gci
+    # - gci // too many false positives. パッケージが依存していると怒られる
     - ginkgolinter
     - gocheckcompilerdirectives
     - gochecknoglobals
@@ -39,11 +39,11 @@ linters:
     - gocritic
     - gocyclo
     - godot
-    - godox
+    # - godox // too many false positives. コメントにTODOがあると怒られる
     - gofmt
     - gofumpt
     - goheader
-    - goimports
+    # - goimports // too many false positives. パッケージが依存していると怒られる
     - gomoddirectives
     - gomodguard
     - goprintffuncname
@@ -97,14 +97,15 @@ linters:
     - testpackage
     - thelper
     - tparallel
-    - typecheck
     - unconvert
     - unparam
     - unused
     - usestdlibvars
-    - varnamelen
+    # - varnamelen // too many false positives. 変数名idが短いと怒られる
     - wastedassign
     - whitespace
     - wrapcheck
-    - wsl
+    # - wsl
     - zerologlint
+  disable:
+    - typecheck

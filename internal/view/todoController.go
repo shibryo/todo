@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/labstack/echo/v4"
+	echo "github.com/labstack/echo/v4"
 	app "todo/internal/app"
 )
 
@@ -13,9 +13,9 @@ import (
 type TodoResponseView struct {
 	ID         uint64 `json:"id"`
 	Title      string `json:"title"`
-	Completed  bool   `default:"false"    json:"completed"`
-	LastUpdate string `json:"last_update"`
-	CreatedAt  string `json:"created_at"`
+	Completed  bool   `default:"false"   json:"completed"`
+	LastUpdate string `json:"lastUpdate"`
+	CreatedAt  string `json:"createdAt"`
 }
 
 // TodoRequestViewはTodoのリクエストビューです。
@@ -49,7 +49,6 @@ func (ctrl *TodoController) GetHello() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	}
-
 }
 
 // FindAllTodo godoc
@@ -67,6 +66,7 @@ func (ctrl *TodoController) FindAllTodo() echo.HandlerFunc {
 		}
 
 		todoViews := make([]TodoResponseView, 0, len(todos))
+
 		for _, todo := range todos {
 			todoView := TodoResponseView{
 				ID:         uint64(todo.ID),
@@ -77,6 +77,7 @@ func (ctrl *TodoController) FindAllTodo() echo.HandlerFunc {
 			}
 			todoViews = append(todoViews, todoView)
 		}
+
 		return c.JSON(http.StatusOK, todoViews)
 	}
 }
@@ -97,7 +98,8 @@ func (ctrl *TodoController) FindTodoByID() echo.HandlerFunc {
 		}
 
 		reqTodo := app.NewTodoIDData(id)
-		todo, err := ctrl.todoComandService.FindByIdCommand(reqTodo)
+
+		todo, err := ctrl.todoComandService.FindByIDCommand(reqTodo)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
@@ -109,6 +111,7 @@ func (ctrl *TodoController) FindTodoByID() echo.HandlerFunc {
 			LastUpdate: todo.LastUpdate.AsGoString(),
 			CreatedAt:  todo.CreatedAt.AsGoString(),
 		}
+
 		return c.JSON(http.StatusOK, todoView)
 	}
 }
@@ -125,16 +128,20 @@ func (ctrl *TodoController) FindTodoByID() echo.HandlerFunc {
 func (ctrl *TodoController) CreateTodo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		todoRequestView := new(TodoRequestView)
+
 		if err := c.Bind(todoRequestView); err != nil {
 			slog.Info("bind error", "err", err)
+
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
 		todo := app.NewToDoData(0, todoRequestView.Title, todoRequestView.Completed)
+
 		err := ctrl.todoComandService.CreateTodoCommand(todo)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
+
 		return c.JSON(http.StatusCreated, "success")
 	}
 }
@@ -155,12 +162,14 @@ func (ctrl *TodoController) UpdateTodo() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, err)
 		}
+
 		todoRequestView := new(TodoRequestView)
 		if err := c.Bind(todoRequestView); err != nil {
 			return c.JSON(http.StatusBadRequest, err)
 		}
 
 		todo := app.NewToDoData(id, todoRequestView.Title, todoRequestView.Completed)
+
 		err = ctrl.todoComandService.UpdateTodoCommand(todo)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
@@ -186,6 +195,7 @@ func (ctrl *TodoController) DeleteTodo() echo.HandlerFunc {
 		}
 
 		todo := app.NewTodoIDData(id)
+
 		err = ctrl.todoComandService.DeleteTodoCommand(todo)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
