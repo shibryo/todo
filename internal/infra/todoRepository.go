@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"todo/internal/app"
 	"todo/internal/domain"
 
 	"github.com/uptrace/bun"
@@ -19,15 +20,6 @@ type Todo struct {
 	Completed  bool  `bun:"completed,notnull,default:false"`
 	LastUpdate time.Time `bun:"last_update,notnull,default:current_timestamp"`
 	CreatedAt  time.Time `bun:"created_at,notnull,default:current_timestamp"`
-}
-
-// TodoRepositorierはTodoのリポジトリインターフェースです。
-type TodoRepositorier interface {
-	FindAll() ([]*domain.Todo, error)
-	FindByID(id uint64) (*domain.Todo, error)
-	Create(todoModel *domain.Todo) error
-	Update(todoModel *domain.Todo) error
-	Delete(todoModel *domain.DeletableTodo) error
 }
 
 // TodoRepositoryはTodoのリポジトリ構造体です。
@@ -139,6 +131,6 @@ func (t *TodoRepository) Delete(todoModel *domain.DeletableTodo) error {
 	return nil
 }
 
-func NewTodoRepository(db *bun.DB) TodoRepositorier {
+func NewTodoRepository(db *bun.DB) app.TodoRepositorier {
 	return &TodoRepository{db: db}
 }

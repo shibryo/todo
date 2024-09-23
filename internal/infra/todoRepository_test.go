@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 	"time"
+	"todo/internal/app"
 	"todo/internal/di"
 	"todo/internal/domain"
-	infra "todo/internal/infra"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
@@ -45,7 +45,7 @@ func SetupDB(t *testing.T) string{
 	return connStr
 }
 
-func NewTestTodoRepository(t *testing.T) (infra.TodoRepositorier, error) {
+func NewTestTodoRepository(t *testing.T) (app.TodoRepositorier, error) {
 	dsn := SetupDB(t)
 	repository, err := di.NewDITodoRepository(dsn)
 	if err != nil {

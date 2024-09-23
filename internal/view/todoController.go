@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 	app "todo/internal/app"
-	"todo/internal/infra"
 
 	"github.com/labstack/echo/v4"
 )
@@ -28,11 +27,11 @@ type TodoRequestView struct {
 // TodoControllerはTodoのコントローラーです。
 type TodoController struct {
 	todoComandService app.TodoComandService
-	todoRepository infra.TodoRepositorier
+	todoRepository app.TodoRepositorier
 }
 
 // NewTodoControllerはTodoのコントローラーを生成します。
-func NewTodoController(todoComandService app.TodoComandService, todoRepository infra.TodoRepositorier) *TodoController {
+func NewTodoController(todoComandService app.TodoComandService, todoRepository app.TodoRepositorier) *TodoController {
 	return &TodoController{
 		todoComandService: todoComandService,
 		todoRepository: todoRepository,

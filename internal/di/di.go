@@ -32,7 +32,7 @@ func getEnv() (config, error) {
 }
 
 // TodoRepositoryに依存性を注入します。
-func NewDITodoRepository(dsn string) (infra.TodoRepositorier, error) {
+func NewDITodoRepository(dsn string) (app.TodoRepositorier, error) {
 	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
 	db := bun.NewDB(sqldb, pgdialect.New())
 	// create todos table

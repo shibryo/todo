@@ -5,7 +5,6 @@ package app
 import (
 	"fmt"
 	"todo/internal/domain"
-	repository "todo/internal/infra"
 )
 
 type TodoIDData struct {
@@ -43,11 +42,11 @@ type TodoComandService interface {
 
 // TodoComandServiceはTodoのコマンドサービス構造体です。
 type TodoComandServiceImpl struct {
-	repository repository.TodoRepositorier
+	repository TodoRepositorier
 }
 
 // NewTodoCommandServiceImplはTodoのコマンドサービスを生成します。
-func NewTodoCommandServiceImpl(repository repository.TodoRepositorier) TodoComandService {
+func NewTodoCommandServiceImpl(repository TodoRepositorier) TodoComandService {
 	return &TodoComandServiceImpl{repository: repository}
 }
 
